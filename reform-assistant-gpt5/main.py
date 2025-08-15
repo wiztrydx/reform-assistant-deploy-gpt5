@@ -44,7 +44,7 @@ def chat():
         
         # OpenAI API v1.x の新しい構文
         response = openai_client.chat.completions.create(
-            model="gpt-4",  # GPT-5が利用できない場合はGPT-4を使用
+            model="gpt-4",
             messages=messages,
             max_tokens=1500,
             temperature=0.7
@@ -69,38 +69,53 @@ def initial_message():
         print("📨 Initial message request received")
         openai_client = get_openai_client()
         if not openai_client:
+            print("❌ OpenAI client not available")
             return jsonify({'error': 'OpenAI client not available'}), 500
             
         data = request.get_json()
         if not data:
+            print("❌ No JSON data received")
             return jsonify({'error': 'No JSON data received'}), 400
             
         form_data = data.get('formData', {})
-        print("📋 Processing form data for initial message")
+        print(f"📋 Processing form data: {form_data}")
+        
+        # 安全にデータを取得（Noneの場合は空のリストや文字列を返す）
+        family_members = form_data.get('familyMembers', []) or []
+        pets = form_data.get('pets', {}) or {}
+        address = form_data.get('address', '') or ''
+        lifestyle = form_data.get('lifestyle', []) or []
+        hobbies = form_data.get('hobbies', []) or []
+        interior_style = form_data.get('interiorStyle', []) or []
+        reform_areas = form_data.get('reformAreas', []) or []
+        reform_reasons = form_data.get('reformReasons', []) or []
+        other_requests = form_data.get('otherRequests', '') or ''
         
         # フォームデータを基にプロンプトを作成
         prompt = f"""
 あなたはリフォーム熊本の親しみやすいAIアドバイザーです。以下のお客様情報を基に、4つの魅力的なリフォームプランを提案してください。
 
 お客様情報:
-- 家族構成: {form_data.get('familyMembers', [])}
-- ペット: {form_data.get('pets', {})}
-- 住所: {form_data.get('address', '')}
-- ライフスタイル: {form_data.get('lifestyle', [])}
-- 趣味: {form_data.get('hobbies', [])}
-- インテリアスタイル: {form_data.get('interiorStyle', [])}
-- リフォーム箇所: {form_data.get('reformAreas', [])}
-- リフォーム理由: {form_data.get('reformReasons', [])}
-- その他の要望: {form_data.get('otherRequests', '')}
+- 家族構成: {family_members}
+- ペット: {pets}
+- 住所: {address}
+- ライフスタイル: {lifestyle}
+- 趣味: {hobbies}
+- インテリアスタイル: {interior_style}
+- リフォーム箇所: {reform_areas}
+- リフォーム理由: {reform_reasons}
+- その他の要望: {other_requests}
 
 4つのプランを番号付きで提案し、それぞれに絵文字とキャッチーなタイトルをつけてください。
 各プランは2-3行で簡潔に説明してください。
 最後に「どのプランが気になりますか？番号で教えてください！😊」と質問してください。
 """
         
+        print("🤖 Sending request to OpenAI...")
+        
         # OpenAI API v1.x の新しい構文
         response = openai_client.chat.completions.create(
-            model="gpt-4",  # GPT-5が利用できない場合はGPT-4を使用
+            model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1500,
             temperature=0.7
@@ -114,6 +129,8 @@ def initial_message():
         })
     except Exception as e:
         print(f"❌ Error in initial_message endpoint: {e}")
+        import traceback
+        traceback.print_exc()
         return jsonify({'error': f'Initial message error: {str(e)}'}), 500
 
 @app.route('/api/health', methods=['GET'])
@@ -135,7 +152,7 @@ def health_check():
             'client_status': client_status,
             'api_provider': 'OpenAI',
             'model': 'GPT-4',
-            'version': '2025.08.15-fixed'
+            'version': '2025.08.15-final-fix'
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
