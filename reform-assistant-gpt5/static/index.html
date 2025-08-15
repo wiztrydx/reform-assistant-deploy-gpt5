@@ -150,14 +150,20 @@
 
         /* フォーム要素 */
         .form-group {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
             margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
         }
 
         .form-group h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 1rem;
+            color: #3b82f6;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .checkbox-grid {
@@ -170,29 +176,32 @@
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 1rem;
+            padding: 1.2rem;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
             cursor: pointer;
             transition: all 0.2s ease;
-            background: #fafafa;
+            background: white;
+            font-size: 1rem;
+            user-select: none;
         }
 
         .checkbox-item:hover {
             border-color: #3b82f6;
-            background: #f8fafc;
+            background: #eff6ff;
             transform: translateY(-1px);
         }
 
         .checkbox-item.checked {
             border-color: #3b82f6;
-            background: linear-gradient(135deg, #eff6ff 0%, #fef2f2 100%);
+            background: linear-gradient(135deg, #dbeafe 0%, #fef2f2 100%);
         }
 
         .checkbox-item input[type="checkbox"] {
             width: 18px;
             height: 18px;
             accent-color: #3b82f6;
+            pointer-events: none;
         }
 
         .checkbox-item label {
@@ -200,6 +209,7 @@
             color: #1e293b;
             cursor: pointer;
             flex: 1;
+            pointer-events: none;
         }
 
         .select-group {
@@ -215,10 +225,10 @@
 
         .select-group select {
             width: 100%;
-            padding: 0.875rem 1rem;
+            padding: 1rem 1.2rem;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             background: white;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -228,6 +238,7 @@
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: #eff6ff;
         }
 
         .textarea-group {
@@ -243,7 +254,7 @@
 
         .textarea-group textarea {
             width: 100%;
-            padding: 1rem;
+            padding: 1.2rem;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
             font-size: 1rem;
@@ -251,12 +262,14 @@
             resize: vertical;
             min-height: 120px;
             transition: all 0.2s ease;
+            background: white;
         }
 
         .textarea-group textarea:focus {
             outline: none;
             border-color: #3b82f6;
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: #eff6ff;
         }
 
         /* ナビゲーション */
@@ -480,10 +493,10 @@
             cursor: not-allowed;
         }
 
-        /* ホバー問い合わせボタン - 位置を上に移動 */
+        /* ホバー問い合わせボタン - 位置を少し下に調整 */
         .contact-button {
             position: absolute;
-            top: 50%;
+            top: 60%;
             right: 2rem;
             transform: translateY(-50%);
             padding: 1rem 1.5rem;
@@ -569,7 +582,7 @@
             }
 
             .contact-button {
-                top: 30%;
+                top: 50%;
                 right: 1rem;
                 padding: 0.75rem 1rem;
                 font-size: 0.9rem;
@@ -598,70 +611,6 @@
             height: 24px;
             fill: currentColor;
         }
-
-        /* 答えやすさの改善 */
-        .form-group {
-            background: #f8fafc;
-            padding: 1.5rem;
-            border-radius: 12px;
-            margin-bottom: 2rem;
-            border: 1px solid #e2e8f0;
-        }
-
-        .form-group h3 {
-            color: #3b82f6;
-            font-size: 1.2rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .form-group h3::before {
-            content: "📝";
-            font-size: 1rem;
-        }
-
-        .checkbox-item {
-            background: white;
-            border: 2px solid #e2e8f0;
-            font-size: 1rem;
-            padding: 1.2rem;
-        }
-
-        .checkbox-item:hover {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
-
-        .checkbox-item.checked {
-            border-color: #3b82f6;
-            background: linear-gradient(135deg, #dbeafe 0%, #fef2f2 100%);
-        }
-
-        .select-group select {
-            font-size: 1.1rem;
-            padding: 1rem 1.2rem;
-            background: white;
-            border: 2px solid #e2e8f0;
-        }
-
-        .select-group select:focus {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
-
-        .textarea-group textarea {
-            font-size: 1rem;
-            padding: 1.2rem;
-            background: white;
-            border: 2px solid #e2e8f0;
-        }
-
-        .textarea-group textarea:focus {
-            border-color: #3b82f6;
-            background: #eff6ff;
-        }
     </style>
 </head>
 <body>
@@ -671,7 +620,7 @@
             <div class="header">
                 <div class="header-content">
                     <h1>🏠 リフォーム提案アシスタント</h1>
-                    <p>詳細なヒアリングを通じて、あなたにぴったりのリフォームプランをご提案します</p>
+                    <p>簡単なヒアリングを通じて、あなたにぴったりのリフォームプランをご提案します</p>
                 </div>
             </div>
 
@@ -687,8 +636,8 @@
                         <span id="step-name">家族構成</span>
                     </div>
                     <div>
-                        <span id="step-text">ステップ 1 / 10</span>
-                        <span id="progress-percent" style="margin-left: 1rem; font-weight: 600;">10%</span>
+                        <span id="step-text">ステップ 1 / 7</span>
+                        <span id="progress-percent" style="margin-left: 1rem; font-weight: 600;">14%</span>
                     </div>
                 </div>
             </div>
@@ -753,7 +702,7 @@
                     </button>
                 </div>
 
-                <!-- ホバー問い合わせボタン - 位置を上に移動 -->
+                <!-- ホバー問い合わせボタン - 位置を少し下に調整 -->
                 <a href="https://re-homekumamoto.com/contact/" target="_blank" class="contact-button" id="contact-button">
                     <svg class="icon" viewBox="0 0 24 24">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/>
@@ -767,35 +716,19 @@
     <script>
         // グローバル変数
         let currentStep = 0;
+        let chatCount = 0; // チャット往復回数をカウント
         let formData = {
             familyMembers: [],
             familyAges: {},
             pets: {},
             currentAddress: '',
-            reformAddress: '',
-            sameAddress: true,
             buildingType: '',
             buildingAge: '',
-            buildingStructure: '',
-            floorArea: '',
-            landArea: '',
-            floors: '',
-            roomCount: '',
             currentIssues: [],
-            sunlight: '',
-            ventilation: '',
             lifestyle: [],
-            workStyle: '',
-            hobbies: [],
-            interiorStyle: [],
-            colorPreferences: [],
             reformAreas: [],
-            reformReasons: [],
             budget: '',
             timeline: '',
-            priority: '',
-            futureFamily: '',
-            livingPeriod: '',
             otherRequests: ''
         };
 
@@ -806,24 +739,19 @@
                 render: renderFamilyStep
             },
             {
+                title: '住所・建物',
+                icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+                render: renderBuildingStep
+            },
+            {
                 title: 'ペット',
                 icon: 'M4.5 9.5C4.5 8.12 5.62 7 7 7s2.5 1.12 2.5 2.5S8.38 12 7 12s-2.5-1.12-2.5-2.5zM17 7c1.38 0 2.5 1.12 2.5 2.5S18.38 12 17 12s-2.5-1.12-2.5-2.5S15.62 7 17 7z',
                 render: renderPetStep
             },
             {
-                title: '住所',
-                icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
-                render: renderAddressStep
-            },
-            {
-                title: '建物情報',
-                icon: 'M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9h.01M9 12h.01M9 15h.01M9 18h.01',
-                render: renderBuildingStep
-            },
-            {
-                title: '現在の住環境',
+                title: '現在の不満',
                 icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
-                render: renderCurrentEnvironmentStep
+                render: renderCurrentIssuesStep
             },
             {
                 title: 'ライフスタイル',
@@ -831,28 +759,18 @@
                 render: renderLifestyleStep
             },
             {
-                title: '趣味・好み',
-                icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
-                render: renderHobbiesStep
-            },
-            {
                 title: 'リフォーム箇所',
                 icon: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
                 render: renderReformAreasStep
             },
             {
-                title: 'リフォーム詳細',
+                title: '予算・時期',
                 icon: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z',
-                render: renderReformDetailsStep
-            },
-            {
-                title: '将来の計画',
-                icon: 'M22 12h-4l-3 9L9 3l-3 9H2',
-                render: renderFuturePlanStep
+                render: renderBudgetStep
             }
         ];
 
-        // ステップ描画関数
+        // ステップ描画関数（厳選版）
         function renderFamilyStep() {
             return `
                 <div class="section-title">
@@ -861,14 +779,14 @@
                     </svg>
                     家族構成を教えてください
                 </div>
-                <p class="section-description">同居されている方全員についてお聞かせください</p>
+                <p class="section-description">同居されている方についてお聞かせください</p>
                 
                 <div class="form-group">
-                    <h3>同居家族</h3>
+                    <h3>👨‍👩‍👧‍👦 同居家族</h3>
                     <div class="checkbox-grid">
-                        ${['本人', '配偶者', '子供（未就学）', '子供（小学生）', '子供（中高生）', '子供（大学生以上）', '両親', '祖父母', 'その他'].map(member => `
-                            <div class="checkbox-item ${formData.familyMembers.includes(member) ? 'checked' : ''}" onclick="toggleCheckbox('familyMembers', '${member}', this)">
-                                <input type="checkbox" ${formData.familyMembers.includes(member) ? 'checked' : ''} onchange="event.stopPropagation()">
+                        ${['本人', '配偶者', '子供（小学生以下）', '子供（中学生以上）', '両親・祖父母', 'その他'].map(member => `
+                            <div class="checkbox-item ${formData.familyMembers.includes(member) ? 'checked' : ''}" data-field="familyMembers" data-value="${member}">
+                                <input type="checkbox" ${formData.familyMembers.includes(member) ? 'checked' : ''}>
                                 <label>${member}</label>
                             </div>
                         `).join('')}
@@ -876,7 +794,7 @@
                 </div>
 
                 <div class="form-group">
-                    <h3>年齢層</h3>
+                    <h3>🎂 年齢層</h3>
                     <div class="select-group">
                         <label for="mainAge">主たる使用者の年齢層</label>
                         <select id="mainAge" onchange="updateFormData('familyAges', {main: this.value})">
@@ -892,42 +810,18 @@
             `;
         }
 
-        function renderPetStep() {
+        function renderBuildingStep() {
             return `
                 <div class="section-title">
                     <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
                         <path d="${steps[1].icon}"/>
                     </svg>
-                    ペットについて教えてください
+                    住所・建物情報
                 </div>
-                <p class="section-description">ペットに配慮した設計のご提案をいたします</p>
+                <p class="section-description">お住まいの地域と建物についてお聞かせください</p>
                 
                 <div class="form-group">
-                    <h3>ペットの種類</h3>
-                    <div class="checkbox-grid">
-                        ${['犬（小型）', '犬（中型）', '犬（大型）', '猫', '鳥', '魚', 'その他', 'いません'].map(pet => `
-                            <div class="checkbox-item ${formData.pets[pet] ? 'checked' : ''}" onclick="togglePetCheckbox('${pet}', this)">
-                                <input type="checkbox" ${formData.pets[pet] ? 'checked' : ''} onchange="event.stopPropagation()">
-                                <label>${pet}</label>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderAddressStep() {
-            return `
-                <div class="section-title">
-                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
-                        <path d="${steps[2].icon}"/>
-                    </svg>
-                    住所情報
-                </div>
-                <p class="section-description">地域に適したリフォームプランをご提案します</p>
-                
-                <div class="form-group">
-                    <h3>お住まいの地域</h3>
+                    <h3>📍 お住まいの地域</h3>
                     <div class="select-group">
                         <label for="currentAddress">現在の住所</label>
                         <select id="currentAddress" onchange="updateFormData('currentAddress', this.value)">
@@ -937,32 +831,15 @@
                             `).join('')}
                         </select>
                     </div>
-                    
-                    <div class="checkbox-item ${formData.sameAddress ? 'checked' : ''}" onclick="toggleSameAddress(this)" style="margin-top: 1rem;">
-                        <input type="checkbox" ${formData.sameAddress ? 'checked' : ''} onchange="event.stopPropagation()">
-                        <label>リフォーム予定地は現住所と同じ</label>
-                    </div>
                 </div>
-            `;
-        }
 
-        function renderBuildingStep() {
-            return `
-                <div class="section-title">
-                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
-                        <path d="${steps[3].icon}"/>
-                    </svg>
-                    建物情報
-                </div>
-                <p class="section-description">建物の詳細情報をお聞かせください</p>
-                
                 <div class="form-group">
-                    <h3>建物の基本情報</h3>
+                    <h3>🏠 建物情報</h3>
                     <div class="select-group">
                         <label for="buildingType">建物種別</label>
                         <select id="buildingType" onchange="updateFormData('buildingType', this.value)">
                             <option value="">建物種別を選択してください</option>
-                            ${['戸建て住宅', '分譲マンション', '賃貸マンション', 'アパート', 'テラスハウス', 'その他'].map(type => `
+                            ${['戸建て住宅', '分譲マンション', '賃貸マンション', 'アパート', 'その他'].map(type => `
                                 <option value="${type}" ${formData.buildingType === type ? 'selected' : ''}>${type}</option>
                             `).join('')}
                         </select>
@@ -972,48 +849,8 @@
                         <label for="buildingAge">築年数</label>
                         <select id="buildingAge" onchange="updateFormData('buildingAge', this.value)">
                             <option value="">築年数を選択してください</option>
-                            ${['新築', '1-5年', '6-10年', '11-15年', '16-20年', '21-30年', '31-40年', '41年以上', '不明'].map(age => `
+                            ${['新築', '1-10年', '11-20年', '21-30年', '31年以上', '不明'].map(age => `
                                 <option value="${age}" ${formData.buildingAge === age ? 'selected' : ''}>${age}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-
-                    <div class="select-group">
-                        <label for="buildingStructure">建物構造</label>
-                        <select id="buildingStructure" onchange="updateFormData('buildingStructure', this.value)">
-                            <option value="">構造を選択してください</option>
-                            ${['木造', '鉄骨造', '鉄筋コンクリート造', '鉄骨鉄筋コンクリート造', '不明'].map(structure => `
-                                <option value="${structure}" ${formData.buildingStructure === structure ? 'selected' : ''}>${structure}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-                    
-                    <div class="select-group">
-                        <label for="floorArea">延床面積（概算）</label>
-                        <select id="floorArea" onchange="updateFormData('floorArea', this.value)">
-                            <option value="">延床面積を選択してください</option>
-                            ${['50㎡未満', '50-80㎡', '80-100㎡', '100-120㎡', '120-150㎡', '150㎡以上', '不明'].map(area => `
-                                <option value="${area}" ${formData.floorArea === area ? 'selected' : ''}>${area}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-
-                    <div class="select-group">
-                        <label for="floors">階数</label>
-                        <select id="floors" onchange="updateFormData('floors', this.value)">
-                            <option value="">階数を選択してください</option>
-                            ${['平屋', '2階建て', '3階建て', '4階建て以上'].map(floor => `
-                                <option value="${floor}" ${formData.floors === floor ? 'selected' : ''}>${floor}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-
-                    <div class="select-group">
-                        <label for="roomCount">部屋数（概算）</label>
-                        <select id="roomCount" onchange="updateFormData('roomCount', this.value)">
-                            <option value="">部屋数を選択してください</option>
-                            ${['1R・1K', '1DK・1LDK', '2DK・2LDK', '3DK・3LDK', '4DK・4LDK', '5DK・5LDK以上'].map(room => `
-                                <option value="${room}" ${formData.roomCount === room ? 'selected' : ''}>${room}</option>
                             `).join('')}
                         </select>
                     </div>
@@ -1021,48 +858,49 @@
             `;
         }
 
-        function renderCurrentEnvironmentStep() {
+        function renderPetStep() {
             return `
                 <div class="section-title">
                     <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
-                        <path d="${steps[4].icon}"/>
+                        <path d="${steps[2].icon}"/>
                     </svg>
-                    現在の住環境について
+                    ペットについて
                 </div>
-                <p class="section-description">現在お困りのことがあればお聞かせください</p>
+                <p class="section-description">ペットに配慮した設計のご提案をいたします</p>
                 
                 <div class="form-group">
-                    <h3>現在の不満点・改善したい点</h3>
+                    <h3>🐕 ペットの種類</h3>
                     <div class="checkbox-grid">
-                        ${['収納が少ない', '部屋が狭い', '日当たりが悪い', '風通しが悪い', '寒い・暑い', '音が気になる', '段差が多い', '掃除しにくい', '古くなった', '使い勝手が悪い', '特になし'].map(issue => `
-                            <div class="checkbox-item ${formData.currentIssues.includes(issue) ? 'checked' : ''}" onclick="toggleCheckbox('currentIssues', '${issue}', this)">
-                                <input type="checkbox" ${formData.currentIssues.includes(issue) ? 'checked' : ''} onchange="event.stopPropagation()">
-                                <label>${issue}</label>
+                        ${['犬（小型）', '犬（中・大型）', '猫', 'その他', 'いません'].map(pet => `
+                            <div class="checkbox-item ${formData.pets[pet] ? 'checked' : ''}" data-field="pets" data-value="${pet}">
+                                <input type="checkbox" ${formData.pets[pet] ? 'checked' : ''}>
+                                <label>${pet}</label>
                             </div>
                         `).join('')}
                     </div>
                 </div>
+            `;
+        }
 
+        function renderCurrentIssuesStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
+                        <path d="${steps[3].icon}"/>
+                    </svg>
+                    現在の不満・改善したい点
+                </div>
+                <p class="section-description">現在お困りのことがあればお聞かせください</p>
+                
                 <div class="form-group">
-                    <h3>住環境の評価</h3>
-                    <div class="select-group">
-                        <label for="sunlight">日当たり</label>
-                        <select id="sunlight" onchange="updateFormData('sunlight', this.value)">
-                            <option value="">日当たりを選択してください</option>
-                            ${['とても良い', '良い', '普通', '悪い', 'とても悪い'].map(light => `
-                                <option value="${light}" ${formData.sunlight === light ? 'selected' : ''}>${light}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-
-                    <div class="select-group">
-                        <label for="ventilation">風通し</label>
-                        <select id="ventilation" onchange="updateFormData('ventilation', this.value)">
-                            <option value="">風通しを選択してください</option>
-                            ${['とても良い', '良い', '普通', '悪い', 'とても悪い'].map(vent => `
-                                <option value="${vent}" ${formData.ventilation === vent ? 'selected' : ''}>${vent}</option>
-                            `).join('')}
-                        </select>
+                    <h3>😟 改善したい点</h3>
+                    <div class="checkbox-grid">
+                        ${['収納が少ない', '部屋が狭い', '日当たりが悪い', '寒い・暑い', '古くなった', '使い勝手が悪い', '特になし'].map(issue => `
+                            <div class="checkbox-item ${formData.currentIssues.includes(issue) ? 'checked' : ''}" data-field="currentIssues" data-value="${issue}">
+                                <input type="checkbox" ${formData.currentIssues.includes(issue) ? 'checked' : ''}>
+                                <label>${issue}</label>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
             `;
@@ -1071,81 +909,20 @@
         function renderLifestyleStep() {
             return `
                 <div class="section-title">
-                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
-                        <path d="${steps[5].icon}"/>
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[4].icon}"/>
                     </svg>
                     ライフスタイル
                 </div>
                 <p class="section-description">普段の生活スタイルについてお聞かせください</p>
                 
                 <div class="form-group">
-                    <h3>働き方・生活スタイル</h3>
-                    <div class="select-group">
-                        <label for="workStyle">働き方・生活スタイル</label>
-                        <select id="workStyle" onchange="updateFormData('workStyle', this.value)">
-                            <option value="">働き方を選択してください</option>
-                            ${['在宅勤務中心', '出社中心', '在宅・出社半々', '専業主婦・主夫', '退職・年金生活', '学生', 'その他'].map(work => `
-                                <option value="${work}" ${formData.workStyle === work ? 'selected' : ''}>${work}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <h3>ライフスタイルの特徴</h3>
+                    <h3>🏡 生活スタイル</h3>
                     <div class="checkbox-grid">
-                        ${['料理をよくする', '家族で過ごす時間を大切にする', '友人をよく招く', 'エンターテイメントを楽しむ', '収納・整理整頓を重視', '掃除しやすさを重視', 'プライバシーを重視', '省エネ・エコを重視', 'バリアフリーを重視'].map(style => `
-                            <div class="checkbox-item ${formData.lifestyle.includes(style) ? 'checked' : ''}" onclick="toggleCheckbox('lifestyle', '${style}', this)">
-                                <input type="checkbox" ${formData.lifestyle.includes(style) ? 'checked' : ''} onchange="event.stopPropagation()">
+                        ${['料理をよくする', '在宅勤務が多い', '友人をよく招く', '収納・整理整頓を重視', '掃除しやすさを重視', 'バリアフリーを重視'].map(style => `
+                            <div class="checkbox-item ${formData.lifestyle.includes(style) ? 'checked' : ''}" data-field="lifestyle" data-value="${style}">
+                                <input type="checkbox" ${formData.lifestyle.includes(style) ? 'checked' : ''}>
                                 <label>${style}</label>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderHobbiesStep() {
-            return `
-                <div class="section-title">
-                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
-                        <path d="${steps[6].icon}"/>
-                    </svg>
-                    趣味・好み
-                </div>
-                <p class="section-description">趣味や好みに合わせた空間をご提案します</p>
-                
-                <div class="form-group">
-                    <h3>趣味・興味</h3>
-                    <div class="checkbox-grid">
-                        ${['料理・お菓子作り', '読書・勉強', '映画・動画鑑賞', '音楽・楽器', 'ガーデニング・園芸', 'DIY・工作', 'アウトドア・キャンプ', 'スポーツ・フィットネス', 'アート・クラフト', 'ゲーム', 'コレクション', 'ペット'].map(hobby => `
-                            <div class="checkbox-item ${formData.hobbies.includes(hobby) ? 'checked' : ''}" onclick="toggleCheckbox('hobbies', '${hobby}', this)">
-                                <input type="checkbox" ${formData.hobbies.includes(hobby) ? 'checked' : ''} onchange="event.stopPropagation()">
-                                <label>${hobby}</label>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <h3>好みのインテリアスタイル</h3>
-                    <div class="checkbox-grid">
-                        ${['モダン・シンプル', 'ナチュラル・木の温もり', '北欧・スカンジナビアン', '和風・和モダン', 'アンティーク・ヴィンテージ', 'インダストリアル・男前', 'ミニマル・無駄のない', 'カントリー・可愛らしい', 'ラグジュアリー・高級感', 'エクレクティック・個性的'].map(style => `
-                            <div class="checkbox-item ${formData.interiorStyle.includes(style) ? 'checked' : ''}" onclick="toggleCheckbox('interiorStyle', '${style}', this)">
-                                <input type="checkbox" ${formData.interiorStyle.includes(style) ? 'checked' : ''} onchange="event.stopPropagation()">
-                                <label>${style}</label>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <h3>好きな色・カラー</h3>
-                    <div class="checkbox-grid">
-                        ${['白・ホワイト', '黒・ブラック', 'グレー・シルバー', 'ベージュ・アイボリー', 'ブラウン・茶色', 'ブルー・青', 'グリーン・緑', 'イエロー・黄色', 'オレンジ・橙', 'レッド・赤', 'パープル・紫', 'ピンク・桃色'].map(color => `
-                            <div class="checkbox-item ${formData.colorPreferences.includes(color) ? 'checked' : ''}" onclick="toggleCheckbox('colorPreferences', '${color}', this)">
-                                <input type="checkbox" ${formData.colorPreferences.includes(color) ? 'checked' : ''} onchange="event.stopPropagation()">
-                                <label>${color}</label>
                             </div>
                         `).join('')}
                     </div>
@@ -1157,18 +934,18 @@
             return `
                 <div class="section-title">
                     <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
-                        <path d="${steps[7].icon}"/>
+                        <path d="${steps[5].icon}"/>
                     </svg>
                     リフォームしたい箇所
                 </div>
                 <p class="section-description">リフォームをご希望の箇所をお選びください</p>
                 
                 <div class="form-group">
-                    <h3>リフォーム箇所</h3>
+                    <h3>🔧 リフォーム箇所</h3>
                     <div class="checkbox-grid">
-                        ${['キッチン', '浴室・お風呂', '洗面所・脱衣所', 'トイレ', 'リビング・ダイニング', '和室', '洋室・寝室', '子供部屋', '書斎・ワークスペース', '玄関・エントランス', '廊下・階段', 'バルコニー・ベランダ', '外壁・屋根', '庭・エクステリア', '全体・間取り変更', 'その他'].map(area => `
-                            <div class="checkbox-item ${formData.reformAreas.includes(area) ? 'checked' : ''}" onclick="toggleCheckbox('reformAreas', '${area}', this)">
-                                <input type="checkbox" ${formData.reformAreas.includes(area) ? 'checked' : ''} onchange="event.stopPropagation()">
+                        ${['キッチン', '浴室・お風呂', '洗面所・トイレ', 'リビング・ダイニング', '和室・洋室', '玄関', '外壁・屋根', '全体・間取り変更'].map(area => `
+                            <div class="checkbox-item ${formData.reformAreas.includes(area) ? 'checked' : ''}" data-field="reformAreas" data-value="${area}">
+                                <input type="checkbox" ${formData.reformAreas.includes(area) ? 'checked' : ''}>
                                 <label>${area}</label>
                             </div>
                         `).join('')}
@@ -1177,35 +954,23 @@
             `;
         }
 
-        function renderReformDetailsStep() {
+        function renderBudgetStep() {
             return `
                 <div class="section-title">
                     <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
-                        <path d="${steps[8].icon}"/>
+                        <path d="${steps[6].icon}"/>
                     </svg>
-                    リフォーム詳細
+                    予算・時期
                 </div>
-                <p class="section-description">リフォームの詳細についてお聞かせください</p>
+                <p class="section-description">リフォームの予算と時期についてお聞かせください</p>
                 
                 <div class="form-group">
-                    <h3>リフォームの理由・きっかけ</h3>
-                    <div class="checkbox-grid">
-                        ${['老朽化・劣化', '機能性の向上', 'デザインの刷新', '家族構成の変化', 'ライフスタイルの変化', '省エネ・エコ対応', 'バリアフリー対応', '収納の充実', '資産価値の向上', 'その他'].map(reason => `
-                            <div class="checkbox-item ${formData.reformReasons.includes(reason) ? 'checked' : ''}" onclick="toggleCheckbox('reformReasons', '${reason}', this)">
-                                <input type="checkbox" ${formData.reformReasons.includes(reason) ? 'checked' : ''} onchange="event.stopPropagation()">
-                                <label>${reason}</label>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <h3>予算・時期・優先度</h3>
+                    <h3>💰 予算・時期</h3>
                     <div class="select-group">
                         <label for="budget">予算（概算）</label>
                         <select id="budget" onchange="updateFormData('budget', this.value)">
                             <option value="">予算を選択してください</option>
-                            ${['50万円未満', '50-100万円', '100-300万円', '300-500万円', '500-1000万円', '1000-1500万円', '1500万円以上', '未定・相談したい'].map(budget => `
+                            ${['100万円未満', '100-300万円', '300-500万円', '500-1000万円', '1000万円以上', '未定・相談したい'].map(budget => `
                                 <option value="${budget}" ${formData.budget === budget ? 'selected' : ''}>${budget}</option>
                             `).join('')}
                         </select>
@@ -1215,106 +980,62 @@
                         <label for="timeline">希望時期</label>
                         <select id="timeline" onchange="updateFormData('timeline', this.value)">
                             <option value="">希望時期を選択してください</option>
-                            ${['すぐに（1ヶ月以内）', '3ヶ月以内', '半年以内', '1年以内', '1年以上先', '未定・相談したい'].map(time => `
+                            ${['すぐに（3ヶ月以内）', '半年以内', '1年以内', '1年以上先', '未定・相談したい'].map(time => `
                                 <option value="${time}" ${formData.timeline === time ? 'selected' : ''}>${time}</option>
                             `).join('')}
                         </select>
                     </div>
-                    
-                    <div class="select-group">
-                        <label for="priority">最も重視すること</label>
-                        <select id="priority" onchange="updateFormData('priority', this.value)">
-                            <option value="">優先度を選択してください</option>
-                            ${['機能性・使いやすさ', 'デザイン性・見た目', 'コストパフォーマンス', '耐久性・品質', '省エネ性・環境性能', '工期の短さ', 'メンテナンスの楽さ'].map(priority => `
-                                <option value="${priority}" ${formData.priority === priority ? 'selected' : ''}>${priority}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-                </div>
-            `;
-        }
-
-        function renderFuturePlanStep() {
-            return `
-                <div class="section-title">
-                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
-                        <path d="${steps[9].icon}"/>
-                    </svg>
-                    将来の計画
-                </div>
-                <p class="section-description">将来を見据えたリフォームプランをご提案します</p>
-                
-                <div class="form-group">
-                    <h3>将来の予定</h3>
-                    <div class="select-group">
-                        <label for="futureFamily">今後5-10年での家族構成の変化予定</label>
-                        <select id="futureFamily" onchange="updateFormData('futureFamily', this.value)">
-                            <option value="">変化予定を選択してください</option>
-                            ${['変化なし', '子供が生まれる予定', '子供が独立予定', '両親との同居予定', '家族が増える予定', '家族が減る予定', '未定・わからない'].map(future => `
-                                <option value="${future}" ${formData.futureFamily === future ? 'selected' : ''}>${future}</option>
-                            `).join('')}
-                        </select>
-                    </div>
-
-                    <div class="select-group">
-                        <label for="livingPeriod">この住まいに住む予定期間</label>
-                        <select id="livingPeriod" onchange="updateFormData('livingPeriod', this.value)">
-                            <option value="">居住予定期間を選択してください</option>
-                            ${['5年未満', '5-10年', '10-20年', '20年以上', '終の棲家として', '未定'].map(period => `
-                                <option value="${period}" ${formData.livingPeriod === period ? 'selected' : ''}>${period}</option>
-                            `).join('')}
-                        </select>
-                    </div>
                 </div>
 
                 <div class="form-group">
-                    <h3>その他のご要望</h3>
+                    <h3>💭 その他のご要望</h3>
                     <div class="textarea-group">
                         <label for="otherRequests">その他のご要望・ご質問</label>
-                        <textarea id="otherRequests" placeholder="その他のご要望やご質問、特別な事情などがあればお聞かせください" onchange="updateFormData('otherRequests', this.value)">${formData.otherRequests}</textarea>
+                        <textarea id="otherRequests" placeholder="その他のご要望やご質問があればお聞かせください" onchange="updateFormData('otherRequests', this.value)">${formData.otherRequests}</textarea>
                     </div>
                 </div>
             `;
         }
 
-        // ユーティリティ関数
-        function toggleCheckbox(field, value, element) {
-            const checkbox = element.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            
-            if (checkbox.checked) {
-                formData[field].push(value);
-                element.classList.add('checked');
-            } else {
-                formData[field] = formData[field].filter(item => item !== value);
-                element.classList.remove('checked');
-            }
-        }
-
-        function togglePetCheckbox(pet, element) {
-            const checkbox = element.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            
-            formData.pets[pet] = checkbox.checked;
-            
-            if (checkbox.checked) {
-                element.classList.add('checked');
-            } else {
-                element.classList.remove('checked');
-            }
-        }
-
-        function toggleSameAddress(element) {
-            const checkbox = element.querySelector('input[type="checkbox"]');
-            checkbox.checked = !checkbox.checked;
-            
-            formData.sameAddress = checkbox.checked;
-            
-            if (checkbox.checked) {
-                element.classList.add('checked');
-            } else {
-                element.classList.remove('checked');
-            }
+        // イベントリスナーを設定する関数
+        function setupCheckboxListeners() {
+            const checkboxItems = document.querySelectorAll('.checkbox-item');
+            checkboxItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const field = this.getAttribute('data-field');
+                    const value = this.getAttribute('data-value');
+                    const checkbox = this.querySelector('input[type="checkbox"]');
+                    
+                    // チェック状態を切り替え
+                    checkbox.checked = !checkbox.checked;
+                    
+                    if (field === 'pets') {
+                        // ペットの場合
+                        formData.pets[value] = checkbox.checked;
+                    } else {
+                        // その他の配列フィールドの場合
+                        if (checkbox.checked) {
+                            if (!formData[field].includes(value)) {
+                                formData[field].push(value);
+                            }
+                            this.classList.add('checked');
+                        } else {
+                            formData[field] = formData[field].filter(item => item !== value);
+                            this.classList.remove('checked');
+                        }
+                    }
+                    
+                    // 見た目を更新
+                    if (checkbox.checked) {
+                        this.classList.add('checked');
+                    } else {
+                        this.classList.remove('checked');
+                    }
+                });
+            });
         }
 
         function updateFormData(field, value) {
@@ -1349,6 +1070,9 @@
         function renderCurrentStep() {
             const stepContent = document.getElementById('step-content');
             stepContent.innerHTML = steps[currentStep].render();
+            
+            // チェックボックスのイベントリスナーを設定
+            setupCheckboxListeners();
             
             // アイコンとタイトルを更新
             const stepIcon = document.getElementById('step-icon');
@@ -1444,6 +1168,9 @@
             addMessage('user', message);
             chatInput.value = '';
             
+            // チャット回数をカウント
+            chatCount++;
+            
             // ローディング表示
             showLoadingMessage();
             
@@ -1457,7 +1184,10 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ messages }),
+                    body: JSON.stringify({ 
+                        messages,
+                        chatCount: chatCount // チャット回数を送信
+                    }),
                 });
                 
                 const data = await response.json();
