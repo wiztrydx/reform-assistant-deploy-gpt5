@@ -481,6 +481,8 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
         }
 
         .send-btn:hover:not(:disabled) {
@@ -491,6 +493,24 @@
         .send-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+        }
+
+        .send-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .send-btn:active::before {
+            width: 100px;
+            height: 100px;
         }
 
         /* ホバー問い合わせボタン - 位置を少し下に調整 */
@@ -695,8 +715,9 @@
                 <div class="chat-input-container">
                     <input type="text" class="chat-input" id="chat-input" placeholder="メッセージを入力してください..." onkeypress="handleChatKeyPress(event)">
                     <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                        <!-- 新しいセンスの良い送信アイコン -->
                         <svg class="icon" viewBox="0 0 24 24">
-                            <path d="M22 2L11 13l-3-3-6 6 3 3 9-9 11-11z"/>
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                         </svg>
                         送信
                     </button>
@@ -1285,3 +1306,4 @@
     </script>
 </body>
 </html>
+
