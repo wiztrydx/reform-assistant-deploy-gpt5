@@ -1,14 +1,1557 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>リフォーム提案アシスタント - リフォーム熊本</title>
-    <script type="module" crossorigin src="/assets/index-oSzgRgYc.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-RMor6f3a.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans JP', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        /* ヘッダー */
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        /* プログレス */
+        .progress-section {
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e2e8f0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #ef4444 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 3px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+            color: #1e293b;
+        }
+
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            fill: #3b82f6;
+        }
+
+        /* メインコンテンツ */
+        .content {
+            padding: 2.5rem 2rem;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #f1f5f9;
+            transition: all 0.3s ease;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-description {
+            color: #64748b;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* フォーム要素 */
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-group h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1rem;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #fafafa;
+        }
+
+        .checkbox-item:hover {
+            border-color: #3b82f6;
+            background: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        .checkbox-item.checked {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #eff6ff 0%, #fef2f2 100%);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #3b82f6;
+        }
+
+        .checkbox-item label {
+            font-weight: 500;
+            color: #1e293b;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .select-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .select-group label {
+            display: block;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .select-group select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .select-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .textarea-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .textarea-group label {
+            display: block;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .textarea-group textarea {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.2s ease;
+        }
+
+        .textarea-group textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* ナビゲーション */
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* チャット画面 */
+        .chat-container {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
+            color: white;
+        }
+
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            position: relative;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .message.assistant .message-avatar {
+            background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
+            color: white;
+        }
+
+        .message.user .message-avatar {
+            background: #64748b;
+            color: white;
+        }
+
+        .message-content {
+            max-width: 75%;
+            padding: 1.25rem 1.5rem;
+            border-radius: 20px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            position: relative;
+        }
+
+        .message.user .message-content {
+            background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+            color: white;
+        }
+
+        .message.assistant .message-content {
+            background: white;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .loading-message {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 1.5rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            max-width: 75%;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .loading-spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e2e8f0;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .chat-input-container {
+            padding: 1.5rem 2rem;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 25px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .chat-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .send-btn {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.3);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ホバー問い合わせボタン - 位置を上に移動 */
+        .contact-button {
+            position: absolute;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+            padding: 1rem 1.5rem;
+            background: white;
+            border: 2px solid #3b82f6;
+            border-radius: 25px;
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateY(-50%) translateX(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 1000;
+            white-space: nowrap;
+        }
+
+        .contact-button.show {
+            opacity: 1;
+            transform: translateY(-50%) translateX(0);
+        }
+
+        .contact-button:hover {
+            background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
+            color: white;
+            transform: translateY(-50%) translateX(-3px);
+            box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* レスポンシブデザイン */
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+
+            .header {
+                padding: 1.5rem 1rem;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .progress-section {
+                padding: 1rem;
+            }
+
+            .content {
+                padding: 1.5rem 1rem;
+            }
+
+            .section-card {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .navigation {
+                padding: 1.5rem 1rem;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-messages {
+                padding: 1rem;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .chat-input-container {
+                padding: 1rem;
+            }
+
+            .contact-button {
+                top: 30%;
+                right: 1rem;
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        /* アニメーション */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* アイコン用のSVG */
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+
+        /* 答えやすさの改善 */
+        .form-group {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-group h3 {
+            color: #3b82f6;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-group h3::before {
+            content: "📝";
+            font-size: 1rem;
+        }
+
+        .checkbox-item {
+            background: white;
+            border: 2px solid #e2e8f0;
+            font-size: 1rem;
+            padding: 1.2rem;
+        }
+
+        .checkbox-item:hover {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .checkbox-item.checked {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #dbeafe 0%, #fef2f2 100%);
+        }
+
+        .select-group select {
+            font-size: 1.1rem;
+            padding: 1rem 1.2rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+        }
+
+        .select-group select:focus {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .textarea-group textarea {
+            font-size: 1rem;
+            padding: 1.2rem;
+            background: white;
+            border: 2px solid #e2e8f0;
+        }
+
+        .textarea-group textarea:focus {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ヒアリング画面 -->
+        <div id="hearing-screen">
+            <div class="header">
+                <div class="header-content">
+                    <h1>🏠 リフォーム提案アシスタント</h1>
+                    <p>詳細なヒアリングを通じて、あなたにぴったりのリフォームプランをご提案します</p>
+                </div>
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-info">
+                    <div class="step-indicator">
+                        <svg class="step-icon" id="step-icon" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        </svg>
+                        <span id="step-name">家族構成</span>
+                    </div>
+                    <div>
+                        <span id="step-text">ステップ 1 / 10</span>
+                        <span id="progress-percent" style="margin-left: 1rem; font-weight: 600;">10%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content">
+                <div class="section-card">
+                    <div id="step-content">
+                        <!-- ステップコンテンツがここに動的に挿入されます -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevStep()" disabled>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 12H5m7-7l-7 7 7 7"/>
+                    </svg>
+                    前へ
+                </button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextStep()">
+                    次へ
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M5 12h14m-7-7l7 7-7 7"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- チャット画面 -->
+        <div id="chat-screen" class="hidden">
+            <div class="chat-container">
+                <div class="chat-header">
+                    <div class="chat-title">
+                        <div class="chat-avatar">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <div>リフォーム提案アシスタント</div>
+                            <div style="font-size: 0.8rem; opacity: 0.8;">あなたの理想の住まいを一緒に考えます</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="backToHearing()" style="padding: 0.5rem;">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M19 12H5m7-7l-7 7 7 7"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="chat-messages" id="chat-messages">
+                    <!-- チャットメッセージがここに表示されます -->
+                </div>
+
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="メッセージを入力してください..." onkeypress="handleChatKeyPress(event)">
+                    <button class="send-btn" id="send-btn" onclick="sendMessage()">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M22 2L11 13l-3-3-6 6 3 3 9-9 11-11z"/>
+                        </svg>
+                        送信
+                    </button>
+                </div>
+
+                <!-- ホバー問い合わせボタン - 位置を上に移動 -->
+                <a href="https://re-homekumamoto.com/contact/" target="_blank" class="contact-button" id="contact-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/>
+                    </svg>
+                    詳しくはこちら
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // グローバル変数
+        let currentStep = 0;
+        let formData = {
+            familyMembers: [],
+            familyAges: {},
+            pets: {},
+            currentAddress: '',
+            reformAddress: '',
+            sameAddress: true,
+            buildingType: '',
+            buildingAge: '',
+            buildingStructure: '',
+            floorArea: '',
+            landArea: '',
+            floors: '',
+            roomCount: '',
+            currentIssues: [],
+            sunlight: '',
+            ventilation: '',
+            lifestyle: [],
+            workStyle: '',
+            hobbies: [],
+            interiorStyle: [],
+            colorPreferences: [],
+            reformAreas: [],
+            reformReasons: [],
+            budget: '',
+            timeline: '',
+            priority: '',
+            futureFamily: '',
+            livingPeriod: '',
+            otherRequests: ''
+        };
+
+        const steps = [
+            {
+                title: '家族構成',
+                icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
+                render: renderFamilyStep
+            },
+            {
+                title: 'ペット',
+                icon: 'M4.5 9.5C4.5 8.12 5.62 7 7 7s2.5 1.12 2.5 2.5S8.38 12 7 12s-2.5-1.12-2.5-2.5zM17 7c1.38 0 2.5 1.12 2.5 2.5S18.38 12 17 12s-2.5-1.12-2.5-2.5S15.62 7 17 7z',
+                render: renderPetStep
+            },
+            {
+                title: '住所',
+                icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+                render: renderAddressStep
+            },
+            {
+                title: '建物情報',
+                icon: 'M3 21h18M5 21V7l8-4v18M19 21V11l-6-4M9 9h.01M9 12h.01M9 15h.01M9 18h.01',
+                render: renderBuildingStep
+            },
+            {
+                title: '現在の住環境',
+                icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
+                render: renderCurrentEnvironmentStep
+            },
+            {
+                title: 'ライフスタイル',
+                icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
+                render: renderLifestyleStep
+            },
+            {
+                title: '趣味・好み',
+                icon: 'M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z',
+                render: renderHobbiesStep
+            },
+            {
+                title: 'リフォーム箇所',
+                icon: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+                render: renderReformAreasStep
+            },
+            {
+                title: 'リフォーム詳細',
+                icon: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z',
+                render: renderReformDetailsStep
+            },
+            {
+                title: '将来の計画',
+                icon: 'M22 12h-4l-3 9L9 3l-3 9H2',
+                render: renderFuturePlanStep
+            }
+        ];
+
+        // ステップ描画関数
+        function renderFamilyStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[0].icon}"/>
+                    </svg>
+                    家族構成を教えてください
+                </div>
+                <p class="section-description">同居されている方全員についてお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>同居家族</h3>
+                    <div class="checkbox-grid">
+                        ${['本人', '配偶者', '子供（未就学）', '子供（小学生）', '子供（中高生）', '子供（大学生以上）', '両親', '祖父母', 'その他'].map(member => `
+                            <div class="checkbox-item ${formData.familyMembers.includes(member) ? 'checked' : ''}" onclick="toggleCheckbox('familyMembers', '${member}', this)">
+                                <input type="checkbox" ${formData.familyMembers.includes(member) ? 'checked' : ''} onchange="event.stopPropagation()">
+                                <label>${member}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>年齢層</h3>
+                    <div class="select-group">
+                        <label for="mainAge">主たる使用者の年齢層</label>
+                        <select id="mainAge" onchange="updateFormData('familyAges', {main: this.value})">
+                            <option value="">年齢層を選択してください</option>
+                            <option value="20代" ${formData.familyAges.main === '20代' ? 'selected' : ''}>20代</option>
+                            <option value="30代" ${formData.familyAges.main === '30代' ? 'selected' : ''}>30代</option>
+                            <option value="40代" ${formData.familyAges.main === '40代' ? 'selected' : ''}>40代</option>
+                            <option value="50代" ${formData.familyAges.main === '50代' ? 'selected' : ''}>50代</option>
+                            <option value="60代以上" ${formData.familyAges.main === '60代以上' ? 'selected' : ''}>60代以上</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPetStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
+                        <path d="${steps[1].icon}"/>
+                    </svg>
+                    ペットについて教えてください
+                </div>
+                <p class="section-description">ペットに配慮した設計のご提案をいたします</p>
+                
+                <div class="form-group">
+                    <h3>ペットの種類</h3>
+                    <div class="checkbox-grid">
+                        ${['犬（小型）', '犬（中型）', '犬（大型）', '猫', '鳥', '魚', 'その他', 'いません'].map(pet => `
+                            <div class="checkbox-item ${formData.pets[pet] ? 'checked' : ''}" onclick="togglePetCheckbox('${pet}', this)">
+                                <input type="checkbox" ${formData.pets[pet] ? 'checked' : ''} onchange="event.stopPropagation()">
+                                <label>${pet}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAddressStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[2].icon}"/>
+                    </svg>
+                    住所情報
+                </div>
+                <p class="section-description">地域に適したリフォームプランをご提案します</p>
+                
+                <div class="form-group">
+                    <h3>お住まいの地域</h3>
+                    <div class="select-group">
+                        <label for="currentAddress">現在の住所</label>
+                        <select id="currentAddress" onchange="updateFormData('currentAddress', this.value)">
+                            <option value="">市区町村を選択してください</option>
+                            ${['熊本市中央区', '熊本市東区', '熊本市西区', '熊本市南区', '熊本市北区', '八代市', '人吉市', '荒尾市', '水俣市', '玉名市', '山鹿市', '菊池市', '宇土市', '上天草市', '宇城市', '阿蘇市', '天草市', '合志市', 'その他熊本県内', '熊本県外'].map(city => `
+                                <option value="${city}" ${formData.currentAddress === city ? 'selected' : ''}>${city}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="checkbox-item ${formData.sameAddress ? 'checked' : ''}" onclick="toggleSameAddress(this)" style="margin-top: 1rem;">
+                        <input type="checkbox" ${formData.sameAddress ? 'checked' : ''} onchange="event.stopPropagation()">
+                        <label>リフォーム予定地は現住所と同じ</label>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBuildingStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
+                        <path d="${steps[3].icon}"/>
+                    </svg>
+                    建物情報
+                </div>
+                <p class="section-description">建物の詳細情報をお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>建物の基本情報</h3>
+                    <div class="select-group">
+                        <label for="buildingType">建物種別</label>
+                        <select id="buildingType" onchange="updateFormData('buildingType', this.value)">
+                            <option value="">建物種別を選択してください</option>
+                            ${['戸建て住宅', '分譲マンション', '賃貸マンション', 'アパート', 'テラスハウス', 'その他'].map(type => `
+                                <option value="${type}" ${formData.buildingType === type ? 'selected' : ''}>${type}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="select-group">
+                        <label for="buildingAge">築年数</label>
+                        <select id="buildingAge" onchange="updateFormData('buildingAge', this.value)">
+                            <option value="">築年数を選択してください</option>
+                            ${['新築', '1-5年', '6-10年', '11-15年', '16-20年', '21-30年', '31-40年', '41年以上', '不明'].map(age => `
+                                <option value="${age}" ${formData.buildingAge === age ? 'selected' : ''}>${age}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+
+                    <div class="select-group">
+                        <label for="buildingStructure">建物構造</label>
+                        <select id="buildingStructure" onchange="updateFormData('buildingStructure', this.value)">
+                            <option value="">構造を選択してください</option>
+                            ${['木造', '鉄骨造', '鉄筋コンクリート造', '鉄骨鉄筋コンクリート造', '不明'].map(structure => `
+                                <option value="${structure}" ${formData.buildingStructure === structure ? 'selected' : ''}>${structure}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="select-group">
+                        <label for="floorArea">延床面積（概算）</label>
+                        <select id="floorArea" onchange="updateFormData('floorArea', this.value)">
+                            <option value="">延床面積を選択してください</option>
+                            ${['50㎡未満', '50-80㎡', '80-100㎡', '100-120㎡', '120-150㎡', '150㎡以上', '不明'].map(area => `
+                                <option value="${area}" ${formData.floorArea === area ? 'selected' : ''}>${area}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+
+                    <div class="select-group">
+                        <label for="floors">階数</label>
+                        <select id="floors" onchange="updateFormData('floors', this.value)">
+                            <option value="">階数を選択してください</option>
+                            ${['平屋', '2階建て', '3階建て', '4階建て以上'].map(floor => `
+                                <option value="${floor}" ${formData.floors === floor ? 'selected' : ''}>${floor}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+
+                    <div class="select-group">
+                        <label for="roomCount">部屋数（概算）</label>
+                        <select id="roomCount" onchange="updateFormData('roomCount', this.value)">
+                            <option value="">部屋数を選択してください</option>
+                            ${['1R・1K', '1DK・1LDK', '2DK・2LDK', '3DK・3LDK', '4DK・4LDK', '5DK・5LDK以上'].map(room => `
+                                <option value="${room}" ${formData.roomCount === room ? 'selected' : ''}>${room}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCurrentEnvironmentStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[4].icon}"/>
+                    </svg>
+                    現在の住環境について
+                </div>
+                <p class="section-description">現在お困りのことがあればお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>現在の不満点・改善したい点</h3>
+                    <div class="checkbox-grid">
+                        ${['収納が少ない', '部屋が狭い', '日当たりが悪い', '風通しが悪い', '寒い・暑い', '音が気になる', '段差が多い', '掃除しにくい', '古くなった', '使い勝手が悪い', '特になし'].map(issue => `
+                            <div class="checkbox-item ${formData.currentIssues.includes(issue) ? 'checked' : ''}" onclick="toggleCheckbox('currentIssues', '${issue}', this)">
+                                <input type="checkbox" ${formData.currentIssues.includes(issue) ? 'checked' : ''} onchange="event.stopPropagation()">
+                                <label>${issue}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>住環境の評価</h3>
+                    <div class="select-group">
+                        <label for="sunlight">日当たり</label>
+                        <select id="sunlight" onchange="updateFormData('sunlight', this.value)">
+                            <option value="">日当たりを選択してください</option>
+                            ${['とても良い', '良い', '普通', '悪い', 'とても悪い'].map(light => `
+                                <option value="${light}" ${formData.sunlight === light ? 'selected' : ''}>${light}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+
+                    <div class="select-group">
+                        <label for="ventilation">風通し</label>
+                        <select id="ventilation" onchange="updateFormData('ventilation', this.value)">
+                            <option value="">風通しを選択してください</option>
+                            ${['とても良い', '良い', '普通', '悪い', 'とても悪い'].map(vent => `
+                                <option value="${vent}" ${formData.ventilation === vent ? 'selected' : ''}>${vent}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLifestyleStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
+                        <path d="${steps[5].icon}"/>
+                    </svg>
+                    ライフスタイル
+                </div>
+                <p class="section-description">普段の生活スタイルについてお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>働き方・生活スタイル</h3>
+                    <div class="select-group">
+                        <label for="workStyle">働き方・生活スタイル</label>
+                        <select id="workStyle" onchange="updateFormData('workStyle', this.value)">
+                            <option value="">働き方を選択してください</option>
+                            ${['在宅勤務中心', '出社中心', '在宅・出社半々', '専業主婦・主夫', '退職・年金生活', '学生', 'その他'].map(work => `
+                                <option value="${work}" ${formData.workStyle === work ? 'selected' : ''}>${work}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>ライフスタイルの特徴</h3>
+                    <div class="checkbox-grid">
+                        ${['料理をよくする', '家族で過ごす時間を大切にする', '友人をよく招く', 'エンターテイメントを楽しむ', '収納・整理整頓を重視', '掃除しやすさを重視', 'プライバシーを重視', '省エネ・エコを重視', 'バリアフリーを重視'].map(style => `
+                            <div class="checkbox-item ${formData.lifestyle.includes(style) ? 'checked' : ''}" onclick="toggleCheckbox('lifestyle', '${style}', this)">
+                                <input type="checkbox" ${formData.lifestyle.includes(style) ? 'checked' : ''} onchange="event.stopPropagation()">
+                                <label>${style}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHobbiesStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[6].icon}"/>
+                    </svg>
+                    趣味・好み
+                </div>
+                <p class="section-description">趣味や好みに合わせた空間をご提案します</p>
+                
+                <div class="form-group">
+                    <h3>趣味・興味</h3>
+                    <div class="checkbox-grid">
+                        ${['料理・お菓子作り', '読書・勉強', '映画・動画鑑賞', '音楽・楽器', 'ガーデニング・園芸', 'DIY・工作', 'アウトドア・キャンプ', 'スポーツ・フィットネス', 'アート・クラフト', 'ゲーム', 'コレクション', 'ペット'].map(hobby => `
+                            <div class="checkbox-item ${formData.hobbies.includes(hobby) ? 'checked' : ''}" onclick="toggleCheckbox('hobbies', '${hobby}', this)">
+                                <input type="checkbox" ${formData.hobbies.includes(hobby) ? 'checked' : ''} onchange="event.stopPropagation()">
+                                <label>${hobby}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>好みのインテリアスタイル</h3>
+                    <div class="checkbox-grid">
+                        ${['モダン・シンプル', 'ナチュラル・木の温もり', '北欧・スカンジナビアン', '和風・和モダン', 'アンティーク・ヴィンテージ', 'インダストリアル・男前', 'ミニマル・無駄のない', 'カントリー・可愛らしい', 'ラグジュアリー・高級感', 'エクレクティック・個性的'].map(style => `
+                            <div class="checkbox-item ${formData.interiorStyle.includes(style) ? 'checked' : ''}" onclick="toggleCheckbox('interiorStyle', '${style}', this)">
+                                <input type="checkbox" ${formData.interiorStyle.includes(style) ? 'checked' : ''} onchange="event.stopPropagation()">
+                                <label>${style}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>好きな色・カラー</h3>
+                    <div class="checkbox-grid">
+                        ${['白・ホワイト', '黒・ブラック', 'グレー・シルバー', 'ベージュ・アイボリー', 'ブラウン・茶色', 'ブルー・青', 'グリーン・緑', 'イエロー・黄色', 'オレンジ・橙', 'レッド・赤', 'パープル・紫', 'ピンク・桃色'].map(color => `
+                            <div class="checkbox-item ${formData.colorPreferences.includes(color) ? 'checked' : ''}" onclick="toggleCheckbox('colorPreferences', '${color}', this)">
+                                <input type="checkbox" ${formData.colorPreferences.includes(color) ? 'checked' : ''} onchange="event.stopPropagation()">
+                                <label>${color}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReformAreasStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
+                        <path d="${steps[7].icon}"/>
+                    </svg>
+                    リフォームしたい箇所
+                </div>
+                <p class="section-description">リフォームをご希望の箇所をお選びください</p>
+                
+                <div class="form-group">
+                    <h3>リフォーム箇所</h3>
+                    <div class="checkbox-grid">
+                        ${['キッチン', '浴室・お風呂', '洗面所・脱衣所', 'トイレ', 'リビング・ダイニング', '和室', '洋室・寝室', '子供部屋', '書斎・ワークスペース', '玄関・エントランス', '廊下・階段', 'バルコニー・ベランダ', '外壁・屋根', '庭・エクステリア', '全体・間取り変更', 'その他'].map(area => `
+                            <div class="checkbox-item ${formData.reformAreas.includes(area) ? 'checked' : ''}" onclick="toggleCheckbox('reformAreas', '${area}', this)">
+                                <input type="checkbox" ${formData.reformAreas.includes(area) ? 'checked' : ''} onchange="event.stopPropagation()">
+                                <label>${area}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReformDetailsStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[8].icon}"/>
+                    </svg>
+                    リフォーム詳細
+                </div>
+                <p class="section-description">リフォームの詳細についてお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>リフォームの理由・きっかけ</h3>
+                    <div class="checkbox-grid">
+                        ${['老朽化・劣化', '機能性の向上', 'デザインの刷新', '家族構成の変化', 'ライフスタイルの変化', '省エネ・エコ対応', 'バリアフリー対応', '収納の充実', '資産価値の向上', 'その他'].map(reason => `
+                            <div class="checkbox-item ${formData.reformReasons.includes(reason) ? 'checked' : ''}" onclick="toggleCheckbox('reformReasons', '${reason}', this)">
+                                <input type="checkbox" ${formData.reformReasons.includes(reason) ? 'checked' : ''} onchange="event.stopPropagation()">
+                                <label>${reason}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>予算・時期・優先度</h3>
+                    <div class="select-group">
+                        <label for="budget">予算（概算）</label>
+                        <select id="budget" onchange="updateFormData('budget', this.value)">
+                            <option value="">予算を選択してください</option>
+                            ${['50万円未満', '50-100万円', '100-300万円', '300-500万円', '500-1000万円', '1000-1500万円', '1500万円以上', '未定・相談したい'].map(budget => `
+                                <option value="${budget}" ${formData.budget === budget ? 'selected' : ''}>${budget}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="select-group">
+                        <label for="timeline">希望時期</label>
+                        <select id="timeline" onchange="updateFormData('timeline', this.value)">
+                            <option value="">希望時期を選択してください</option>
+                            ${['すぐに（1ヶ月以内）', '3ヶ月以内', '半年以内', '1年以内', '1年以上先', '未定・相談したい'].map(time => `
+                                <option value="${time}" ${formData.timeline === time ? 'selected' : ''}>${time}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="select-group">
+                        <label for="priority">最も重視すること</label>
+                        <select id="priority" onchange="updateFormData('priority', this.value)">
+                            <option value="">優先度を選択してください</option>
+                            ${['機能性・使いやすさ', 'デザイン性・見た目', 'コストパフォーマンス', '耐久性・品質', '省エネ性・環境性能', '工期の短さ', 'メンテナンスの楽さ'].map(priority => `
+                                <option value="${priority}" ${formData.priority === priority ? 'selected' : ''}>${priority}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFuturePlanStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
+                        <path d="${steps[9].icon}"/>
+                    </svg>
+                    将来の計画
+                </div>
+                <p class="section-description">将来を見据えたリフォームプランをご提案します</p>
+                
+                <div class="form-group">
+                    <h3>将来の予定</h3>
+                    <div class="select-group">
+                        <label for="futureFamily">今後5-10年での家族構成の変化予定</label>
+                        <select id="futureFamily" onchange="updateFormData('futureFamily', this.value)">
+                            <option value="">変化予定を選択してください</option>
+                            ${['変化なし', '子供が生まれる予定', '子供が独立予定', '両親との同居予定', '家族が増える予定', '家族が減る予定', '未定・わからない'].map(future => `
+                                <option value="${future}" ${formData.futureFamily === future ? 'selected' : ''}>${future}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+
+                    <div class="select-group">
+                        <label for="livingPeriod">この住まいに住む予定期間</label>
+                        <select id="livingPeriod" onchange="updateFormData('livingPeriod', this.value)">
+                            <option value="">居住予定期間を選択してください</option>
+                            ${['5年未満', '5-10年', '10-20年', '20年以上', '終の棲家として', '未定'].map(period => `
+                                <option value="${period}" ${formData.livingPeriod === period ? 'selected' : ''}>${period}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>その他のご要望</h3>
+                    <div class="textarea-group">
+                        <label for="otherRequests">その他のご要望・ご質問</label>
+                        <textarea id="otherRequests" placeholder="その他のご要望やご質問、特別な事情などがあればお聞かせください" onchange="updateFormData('otherRequests', this.value)">${formData.otherRequests}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ユーティリティ関数
+        function toggleCheckbox(field, value, element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                formData[field].push(value);
+                element.classList.add('checked');
+            } else {
+                formData[field] = formData[field].filter(item => item !== value);
+                element.classList.remove('checked');
+            }
+        }
+
+        function togglePetCheckbox(pet, element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            formData.pets[pet] = checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('checked');
+            } else {
+                element.classList.remove('checked');
+            }
+        }
+
+        function toggleSameAddress(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            formData.sameAddress = checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('checked');
+            } else {
+                element.classList.remove('checked');
+            }
+        }
+
+        function updateFormData(field, value) {
+            if (field === 'familyAges') {
+                formData.familyAges = { ...formData.familyAges, ...value };
+            } else {
+                formData[field] = value;
+            }
+        }
+
+        // ナビゲーション関数
+        function nextStep() {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                renderCurrentStep();
+                updateProgress();
+                updateNavigation();
+            } else {
+                startChat();
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                renderCurrentStep();
+                updateProgress();
+                updateNavigation();
+            }
+        }
+
+        function renderCurrentStep() {
+            const stepContent = document.getElementById('step-content');
+            stepContent.innerHTML = steps[currentStep].render();
+            
+            // アイコンとタイトルを更新
+            const stepIcon = document.getElementById('step-icon');
+            const stepName = document.getElementById('step-name');
+            
+            stepIcon.innerHTML = `<path d="${steps[currentStep].icon}"/>`;
+            stepName.textContent = steps[currentStep].title;
+        }
+
+        function updateProgress() {
+            const progress = ((currentStep + 1) / steps.length) * 100;
+            document.getElementById('progress-fill').style.width = progress + '%';
+            document.getElementById('step-text').textContent = `ステップ ${currentStep + 1} / ${steps.length}`;
+            document.getElementById('progress-percent').textContent = Math.round(progress) + '%';
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentStep === 0;
+            nextBtn.innerHTML = currentStep === steps.length - 1 ? 
+                `AIに相談する <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>` : 
+                `次へ <svg class="icon" viewBox="0 0 24 24"><path d="M5 12h14m-7-7l7 7-7 7"/></svg>`;
+        }
+
+        // チャット関連の関数
+        async function startChat() {
+            document.getElementById('hearing-screen').classList.add('hidden');
+            document.getElementById('chat-screen').classList.remove('hidden');
+            
+            // ホバーボタンのイベントリスナーを設定
+            const chatContainer = document.querySelector('.chat-container');
+            const contactButton = document.getElementById('contact-button');
+            
+            let hoverTimeout;
+            
+            chatContainer.addEventListener('mouseenter', () => {
+                clearTimeout(hoverTimeout);
+                hoverTimeout = setTimeout(() => {
+                    contactButton.classList.add('show');
+                }, 500); // 0.5秒後に表示
+            });
+            
+            chatContainer.addEventListener('mouseleave', () => {
+                clearTimeout(hoverTimeout);
+                contactButton.classList.remove('show');
+            });
+            
+            // 初期メッセージを取得
+            await getInitialMessage();
+        }
+
+        async function getInitialMessage() {
+            const chatMessages = document.getElementById('chat-messages');
+            
+            // ローディング表示
+            showLoadingMessage();
+            
+            try {
+                const response = await fetch('/api/initial-message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ formData }),
+                });
+                
+                const data = await response.json();
+                
+                // ローディングを削除
+                removeLoadingMessage();
+                
+                if (data.response) {
+                    addMessage('assistant', data.response);
+                } else {
+                    addMessage('assistant', '申し訳ございません。エラーが発生しました。しばらくしてから再度お試しください。');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                removeLoadingMessage();
+                addMessage('assistant', '申し訳ございません。エラーが発生しました。しばらくしてから再度お試しください。');
+            }
+        }
+
+        async function sendMessage() {
+            const chatInput = document.getElementById('chat-input');
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+            
+            // ユーザーメッセージを追加
+            addMessage('user', message);
+            chatInput.value = '';
+            
+            // ローディング表示
+            showLoadingMessage();
+            
+            try {
+                // 現在のメッセージ履歴を取得
+                const messages = getChatHistory();
+                messages.push({ role: 'user', content: message });
+                
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ messages }),
+                });
+                
+                const data = await response.json();
+                
+                // ローディングを削除
+                removeLoadingMessage();
+                
+                if (data.response) {
+                    addMessage('assistant', data.response);
+                } else {
+                    addMessage('assistant', 'エラーが発生しました。再度お試しください。');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                removeLoadingMessage();
+                addMessage('assistant', 'エラーが発生しました。再度お試しください。');
+            }
+        }
+
+        function addMessage(role, content) {
+            const chatMessages = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            
+            const avatarSvg = role === 'assistant' ? 
+                '<svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' :
+                '<svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>';
+            
+            messageDiv.innerHTML = `
+                <div class="message-avatar">${avatarSvg}</div>
+                <div class="message-content">${content}</div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showLoadingMessage() {
+            const chatMessages = document.getElementById('chat-messages');
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message assistant';
+            loadingDiv.id = 'loading-message';
+            
+            loadingDiv.innerHTML = `
+                <div class="message-avatar">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
+                <div class="loading-message">
+                    <div class="loading-spinner"></div>
+                    <span>回答を生成中...</span>
+                </div>
+            `;
+            
+            chatMessages.appendChild(loadingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeLoadingMessage() {
+            const loadingMessage = document.getElementById('loading-message');
+            if (loadingMessage) {
+                loadingMessage.remove();
+            }
+        }
+
+        function getChatHistory() {
+            const messages = [];
+            const messageElements = document.querySelectorAll('.message:not(#loading-message)');
+            
+            messageElements.forEach(element => {
+                const role = element.classList.contains('user') ? 'user' : 'assistant';
+                const content = element.querySelector('.message-content').textContent;
+                messages.push({ role, content });
+            });
+            
+            return messages;
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function backToHearing() {
+            document.getElementById('chat-screen').classList.add('hidden');
+            document.getElementById('hearing-screen').classList.remove('hidden');
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCurrentStep();
+            updateProgress();
+            updateNavigation();
+        });
+    </script>
+</body>
 </html>
