@@ -28,14 +28,15 @@
             position: relative;
         }
 
-        /* ヘッダー */
+        /* ヘッダー - 高さを調整してURL表示領域を確保 */
         .header {
             background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
             color: white;
-            padding: 2rem;
+            padding: 3rem 2rem 2rem 2rem; /* 上部パディングを増加 */
             text-align: center;
             position: relative;
             overflow: hidden;
+            margin-top: 1rem; /* 上部マージンを追加 */
         }
 
         .header::before {
@@ -331,6 +332,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            margin-top: 1rem; /* 上部マージンを追加 */
         }
 
         .chat-header {
@@ -366,6 +368,7 @@
             padding: 2rem;
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             position: relative;
+            padding-bottom: 6rem; /* 下部パディングを増加してボタンとの重複を防ぐ */
         }
 
         .message {
@@ -420,6 +423,21 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.08);
         }
 
+        /* メッセージ内のリンクをクリック可能にする */
+        .message-content a {
+            color: #3b82f6;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+
+        .message.assistant .message-content a {
+            color: #3b82f6;
+        }
+
+        .message.user .message-content a {
+            color: #dbeafe;
+        }
+
         .loading-message {
             display: flex;
             align-items: center;
@@ -452,6 +470,7 @@
             border-top: 1px solid #e2e8f0;
             display: flex;
             gap: 1rem;
+            position: relative;
         }
 
         .chat-input {
@@ -513,12 +532,11 @@
             height: 100px;
         }
 
-        /* ホバー問い合わせボタン - 位置を少し下に調整 */
+        /* ホバー問い合わせボタン - 送信ボタンの少し上に配置 */
         .contact-button {
             position: absolute;
-            top: 60%;
+            bottom: 5.5rem; /* 送信ボタンの少し上に配置 */
             right: 2rem;
-            transform: translateY(-50%);
             padding: 1rem 1.5rem;
             background: white;
             border: 2px solid #3b82f6;
@@ -528,7 +546,7 @@
             font-weight: 600;
             box-shadow: 0 8px 25px rgba(0,0,0,0.15);
             opacity: 0;
-            transform: translateY(-50%) translateX(20px);
+            transform: translateX(20px);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex;
             align-items: center;
@@ -539,13 +557,13 @@
 
         .contact-button.show {
             opacity: 1;
-            transform: translateY(-50%) translateX(0);
+            transform: translateX(0);
         }
 
         .contact-button:hover {
             background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
             color: white;
-            transform: translateY(-50%) translateX(-3px);
+            transform: translateX(-3px);
             box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
         }
 
@@ -561,7 +579,8 @@
             }
 
             .header {
-                padding: 1.5rem 1rem;
+                padding: 2rem 1rem 1.5rem 1rem;
+                margin-top: 0.5rem;
             }
 
             .header h1 {
@@ -591,6 +610,7 @@
 
             .chat-messages {
                 padding: 1rem;
+                padding-bottom: 5rem;
             }
 
             .message-content {
@@ -602,7 +622,7 @@
             }
 
             .contact-button {
-                top: 50%;
+                bottom: 4.5rem;
                 right: 1rem;
                 padding: 0.75rem 1rem;
                 font-size: 0.9rem;
@@ -723,7 +743,7 @@
                     </button>
                 </div>
 
-                <!-- ホバー問い合わせボタン - 位置を少し下に調整 -->
+                <!-- ホバー問い合わせボタン - 送信ボタンの少し上に配置 -->
                 <a href="https://re-homekumamoto.com/contact/" target="_blank" class="contact-button" id="contact-button">
                     <svg class="icon" viewBox="0 0 24 24">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/>
@@ -1237,9 +1257,15 @@
                 '<svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' :
                 '<svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>';
             
+            // URLをリンクに変換する関数
+            const linkifyContent = (text) => {
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                return text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
+            };
+            
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatarSvg}</div>
-                <div class="message-content">${content}</div>
+                <div class="message-content">${linkifyContent(content)}</div>
             `;
             
             chatMessages.appendChild(messageDiv);
