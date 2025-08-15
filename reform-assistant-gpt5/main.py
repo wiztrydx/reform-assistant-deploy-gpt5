@@ -30,7 +30,7 @@ def chat():
         
         # OpenAI API v0.28.x の構文
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-4o",  # <--- 変更点
             messages=messages,
             max_tokens=1500,
             temperature=0.7
@@ -101,7 +101,7 @@ def initial_message():
         
         # OpenAI API v0.28.x の構文
         response = openai.ChatCompletion.create(
-            model="gpt-4",
+            model="gpt-4o",  # <--- 変更点
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1500,
             temperature=0.7
@@ -132,7 +132,7 @@ def health_check():
             'api_key_status': api_key_status,
             'api_key_format': api_key_format,
             'api_provider': 'OpenAI',
-            'model': 'GPT-4',
+            'model': 'GPT-4o',  # <--- 変更点
             'version': '2025.08.15-compatibility-fix'
         })
     except Exception as e:
