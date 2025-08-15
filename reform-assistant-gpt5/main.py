@@ -1,43 +1,86 @@
 import os
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-import openai
+from openai import OpenAI
 
 app = Flask(__name__, static_folder='static')
-CORS(app)
+CORS(app, origins="*", methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type"])
 
-# OpenAI APIキーの設定
-openai.api_key = os.environ.get('OPENAI_API_KEY')
+# OpenAI クライアントの初期化
+client = None
 
-@app.route('/api/chat', methods=['POST'])
+def get_openai_client():
+    global client
+    if client is None:
+        try:
+            api_key = os.environ.get('OPENAI_API_KEY')
+            if not api_key:
+                print("❌ OPENAI_API_KEY not found")
+                return None
+            client = OpenAI(api_key=api_key)
+            print("✅ OpenAI client initialized successfully")
+        except Exception as e:
+            print(f"❌ Error initializing OpenAI client: {e}")
+            return None
+    return client
+
+@app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
+    if request.method == 'OPTIONS':
+        return '', 200
+    
     try:
+        print("📨 Chat request received")
+        openai_client = get_openai_client()
+        if not openai_client:
+            return jsonify({'error': 'OpenAI client not available'}), 500
+            
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No JSON data received'}), 400
+            
         messages = data.get('messages', [])
+        print(f"💬 Processing {len(messages)} messages")
         
-        # GPT-5 APIに送信
-        response = openai.ChatCompletion.create(
-            model="gpt-5",  # 最新のGPT-5モデル
+        # OpenAI API v1.x の新しい構文
+        response = openai_client.chat.completions.create(
+            model="gpt-4",  # GPT-5が利用できない場合はGPT-4を使用
             messages=messages,
             max_tokens=1500,
             temperature=0.7
         )
         
+        result = response.choices[0].message.content
+        print("✅ Chat response generated successfully")
+        
         return jsonify({
-            'response': response.choices[0].message.content
+            'response': result
         })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"❌ Error in chat endpoint: {e}")
+        return jsonify({'error': f'Chat error: {str(e)}'}), 500
 
-@app.route('/api/initial-message', methods=['POST'])
+@app.route('/api/initial-message', methods=['POST', 'OPTIONS'])
 def initial_message():
+    if request.method == 'OPTIONS':
+        return '', 200
+    
     try:
+        print("📨 Initial message request received")
+        openai_client = get_openai_client()
+        if not openai_client:
+            return jsonify({'error': 'OpenAI client not available'}), 500
+            
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No JSON data received'}), 400
+            
         form_data = data.get('formData', {})
+        print("📋 Processing form data for initial message")
         
         # フォームデータを基にプロンプトを作成
         prompt = f"""
-あなたはリフォーム熊本の最先端AIアドバイザーです。GPT-5の高度な推論能力を活用して、以下のお客様情報を基に、4つの革新的で魅力的なリフォームプランを提案してください。
+あなたはリフォーム熊本の親しみやすいAIアドバイザーです。以下のお客様情報を基に、4つの魅力的なリフォームプランを提案してください。
 
 お客様情報:
 - 家族構成: {form_data.get('familyMembers', [])}
@@ -50,28 +93,28 @@ def initial_message():
 - リフォーム理由: {form_data.get('reformReasons', [])}
 - その他の要望: {form_data.get('otherRequests', '')}
 
-GPT-5の高度な推論能力を活用して、お客様のライフスタイルと要望を深く分析し、4つの創造的で実用的なリフォームプランを提案してください。
-各プランには以下を含めてください：
-1. 絵文字とキャッチーなタイトル
-2. 具体的な設計アイデア（2-3行）
-3. 予想される効果やメリット
-4. 概算予算の目安（可能であれば）
-
-最後に「どのプランが気になりますか？番号で教えてください！😊 GPT-5の詳細分析で、さらに具体的な提案も可能です！」と質問してください。
+4つのプランを番号付きで提案し、それぞれに絵文字とキャッチーなタイトルをつけてください。
+各プランは2-3行で簡潔に説明してください。
+最後に「どのプランが気になりますか？番号で教えてください！😊」と質問してください。
 """
         
-        response = openai.ChatCompletion.create(
-            model="gpt-5",  # 最新のGPT-5モデル
+        # OpenAI API v1.x の新しい構文
+        response = openai_client.chat.completions.create(
+            model="gpt-4",  # GPT-5が利用できない場合はGPT-4を使用
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1500,
             temperature=0.7
         )
         
+        result = response.choices[0].message.content
+        print("✅ Initial message generated successfully")
+        
         return jsonify({
-            'response': response.choices[0].message.content
+            'response': result
         })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"❌ Error in initial_message endpoint: {e}")
+        return jsonify({'error': f'Initial message error: {str(e)}'}), 500
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
@@ -81,13 +124,18 @@ def health_check():
         api_key_status = "Set" if api_key else "Not set"
         api_key_format = "Valid" if api_key and api_key.startswith('sk-') else "Invalid"
         
+        # OpenAI クライアントのテスト
+        openai_client = get_openai_client()
+        client_status = "OK" if openai_client else "Failed"
+        
         return jsonify({
             'status': 'healthy',
             'api_key_status': api_key_status,
             'api_key_format': api_key_format,
+            'client_status': client_status,
             'api_provider': 'OpenAI',
-            'model': 'GPT-5',
-            'version': '2025.08.15'
+            'model': 'GPT-4',
+            'version': '2025.08.15-fixed'
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -102,7 +150,7 @@ def serve(path):
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    print(f"🚀 Starting GPT-5 powered Reform Assistant on port {port}")
+    print(f"🚀 Starting Reform Assistant on port {port}")
     print(f"🔑 API Key status: {'Set' if os.environ.get('OPENAI_API_KEY') else 'Not set'}")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=True)
 
