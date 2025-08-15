@@ -1,28 +1,13 @@
 import os
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
-from openai import OpenAI
+import openai
 
 app = Flask(__name__, static_folder='static')
 CORS(app, origins="*", methods=["GET", "POST", "OPTIONS"], allow_headers=["Content-Type"])
 
-# OpenAI クライアントの初期化
-client = None
-
-def get_openai_client():
-    global client
-    if client is None:
-        try:
-            api_key = os.environ.get('OPENAI_API_KEY')
-            if not api_key:
-                print("❌ OPENAI_API_KEY not found")
-                return None
-            client = OpenAI(api_key=api_key)
-            print("✅ OpenAI client initialized successfully")
-        except Exception as e:
-            print(f"❌ Error initializing OpenAI client: {e}")
-            return None
-    return client
+# OpenAI APIキーの設定
+openai.api_key = os.environ.get('OPENAI_API_KEY')
 
 @app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat():
@@ -31,9 +16,10 @@ def chat():
     
     try:
         print("📨 Chat request received")
-        openai_client = get_openai_client()
-        if not openai_client:
-            return jsonify({'error': 'OpenAI client not available'}), 500
+        
+        if not openai.api_key:
+            print("❌ OPENAI_API_KEY not found")
+            return jsonify({'error': 'OpenAI API key not available'}), 500
             
         data = request.get_json()
         if not data:
@@ -42,8 +28,8 @@ def chat():
         messages = data.get('messages', [])
         print(f"💬 Processing {len(messages)} messages")
         
-        # OpenAI API v1.x の新しい構文
-        response = openai_client.chat.completions.create(
+        # OpenAI API v0.28.x の構文
+        response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=messages,
             max_tokens=1500,
@@ -67,10 +53,10 @@ def initial_message():
     
     try:
         print("📨 Initial message request received")
-        openai_client = get_openai_client()
-        if not openai_client:
-            print("❌ OpenAI client not available")
-            return jsonify({'error': 'OpenAI client not available'}), 500
+        
+        if not openai.api_key:
+            print("❌ OPENAI_API_KEY not found")
+            return jsonify({'error': 'OpenAI API key not available'}), 500
             
         data = request.get_json()
         if not data:
@@ -113,8 +99,8 @@ def initial_message():
         
         print("🤖 Sending request to OpenAI...")
         
-        # OpenAI API v1.x の新しい構文
-        response = openai_client.chat.completions.create(
+        # OpenAI API v0.28.x の構文
+        response = openai.ChatCompletion.create(
             model="gpt-4",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=1500,
@@ -141,18 +127,13 @@ def health_check():
         api_key_status = "Set" if api_key else "Not set"
         api_key_format = "Valid" if api_key and api_key.startswith('sk-') else "Invalid"
         
-        # OpenAI クライアントのテスト
-        openai_client = get_openai_client()
-        client_status = "OK" if openai_client else "Failed"
-        
         return jsonify({
             'status': 'healthy',
             'api_key_status': api_key_status,
             'api_key_format': api_key_format,
-            'client_status': client_status,
             'api_provider': 'OpenAI',
             'model': 'GPT-4',
-            'version': '2025.08.15-final-fix'
+            'version': '2025.08.15-compatibility-fix'
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
@@ -170,4 +151,3 @@ if __name__ == '__main__':
     print(f"🚀 Starting Reform Assistant on port {port}")
     print(f"🔑 API Key status: {'Set' if os.environ.get('OPENAI_API_KEY') else 'Not set'}")
     app.run(host='0.0.0.0', port=port, debug=True)
-
