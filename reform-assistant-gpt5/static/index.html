@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>リフォーム提案アシスタント - リフォーム熊本</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
@@ -17,6 +17,7 @@
             background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
             color: #1e293b;
+            overflow-x: hidden;
         }
 
         .container {
@@ -32,11 +33,11 @@
         .header {
             background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
             color: white;
-            padding: 3rem 2rem 2rem 2rem; /* 上部パディングを増加 */
+            padding: 3rem 2rem 2rem 2rem;
             text-align: center;
             position: relative;
             overflow: hidden;
-            margin-top: 1rem; /* 上部マージンを追加 */
+            margin-top: 1rem;
         }
 
         .header::before {
@@ -65,6 +66,45 @@
             font-size: 1.1rem;
             opacity: 0.9;
             font-weight: 300;
+        }
+
+        /* YouTube動画セクション */
+        .video-section {
+            padding: 2rem;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .video-title {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 560px;
+            margin: 0 auto;
+            aspect-ratio: 16 / 9;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
         }
 
         /* プログレス */
@@ -96,6 +136,8 @@
             align-items: center;
             font-size: 0.9rem;
             color: #64748b;
+            flex-wrap: wrap;
+            gap: 0.5rem;
         }
 
         .step-indicator {
@@ -104,12 +146,20 @@
             gap: 0.75rem;
             font-weight: 500;
             color: #1e293b;
+            min-width: 0;
         }
 
         .step-icon {
             width: 24px;
             height: 24px;
             fill: #3b82f6;
+            flex-shrink: 0;
+        }
+
+        .step-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* メインコンテンツ */
@@ -140,6 +190,7 @@
             font-weight: 600;
             color: #1e293b;
             margin-bottom: 0.5rem;
+            flex-wrap: wrap;
         }
 
         .section-description {
@@ -165,11 +216,12 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
         .checkbox-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: 1fr;
             gap: 0.75rem;
         }
 
@@ -185,6 +237,8 @@
             background: white;
             font-size: 1rem;
             user-select: none;
+            min-height: 60px;
+            word-wrap: break-word;
         }
 
         .checkbox-item:hover {
@@ -199,10 +253,11 @@
         }
 
         .checkbox-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             accent-color: #3b82f6;
             pointer-events: none;
+            flex-shrink: 0;
         }
 
         .checkbox-item label {
@@ -211,6 +266,7 @@
             cursor: pointer;
             flex: 1;
             pointer-events: none;
+            line-height: 1.4;
         }
 
         .select-group {
@@ -222,6 +278,7 @@
             font-weight: 600;
             color: #1e293b;
             margin-bottom: 0.5rem;
+            font-size: 1rem;
         }
 
         .select-group select {
@@ -233,6 +290,7 @@
             background: white;
             cursor: pointer;
             transition: all 0.2s ease;
+            min-height: 50px;
         }
 
         .select-group select:focus {
@@ -251,6 +309,7 @@
             font-weight: 600;
             color: #1e293b;
             margin-bottom: 0.5rem;
+            font-size: 1rem;
         }
 
         .textarea-group textarea {
@@ -281,6 +340,7 @@
             padding: 2rem;
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             border-top: 1px solid #e2e8f0;
+            gap: 1rem;
         }
 
         .btn {
@@ -297,6 +357,9 @@
             gap: 0.5rem;
             position: relative;
             overflow: hidden;
+            min-height: 50px;
+            justify-content: center;
+            white-space: nowrap;
         }
 
         .btn-primary {
@@ -332,7 +395,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            margin-top: 1rem; /* 上部マージンを追加 */
+            margin-top: 1rem;
         }
 
         .chat-header {
@@ -342,6 +405,7 @@
             padding: 1.5rem 2rem;
             background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
             color: white;
+            flex-shrink: 0;
         }
 
         .chat-title {
@@ -350,6 +414,7 @@
             gap: 1rem;
             font-size: 1.2rem;
             font-weight: 600;
+            min-width: 0;
         }
 
         .chat-avatar {
@@ -360,6 +425,25 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .chat-title-text {
+            min-width: 0;
+        }
+
+        .chat-title-main {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-title-sub {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .chat-messages {
@@ -368,7 +452,8 @@
             padding: 2rem;
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             position: relative;
-            padding-bottom: 6rem; /* 下部パディングを増加してボタンとの重複を防ぐ */
+            padding-bottom: 6rem;
+            -webkit-overflow-scrolling: touch;
         }
 
         .message {
@@ -376,6 +461,7 @@
             display: flex;
             align-items: flex-start;
             gap: 1rem;
+            max-width: 100%;
         }
 
         .message.user {
@@ -409,6 +495,8 @@
             white-space: pre-wrap;
             line-height: 1.6;
             position: relative;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .message.user .message-content {
@@ -471,6 +559,7 @@
             display: flex;
             gap: 1rem;
             position: relative;
+            flex-shrink: 0;
         }
 
         .chat-input {
@@ -481,6 +570,7 @@
             font-size: 1rem;
             outline: none;
             transition: all 0.2s ease;
+            min-height: 50px;
         }
 
         .chat-input:focus {
@@ -502,6 +592,10 @@
             gap: 0.5rem;
             position: relative;
             overflow: hidden;
+            min-height: 50px;
+            min-width: 100px;
+            justify-content: center;
+            flex-shrink: 0;
         }
 
         .send-btn:hover:not(:disabled) {
@@ -535,7 +629,7 @@
         /* ホバー問い合わせボタン - 送信ボタンの少し上に配置 */
         .contact-button {
             position: absolute;
-            bottom: 5.5rem; /* 送信ボタンの少し上に配置 */
+            bottom: 5.5rem;
             right: 2rem;
             padding: 1rem 1.5rem;
             background: white;
@@ -553,6 +647,7 @@
             gap: 0.5rem;
             z-index: 1000;
             white-space: nowrap;
+            min-height: 50px;
         }
 
         .contact-button.show {
@@ -571,7 +666,7 @@
             display: none;
         }
 
-        /* レスポンシブデザイン */
+        /* レスポンシブデザイン - より詳細な対応 */
         @media (max-width: 768px) {
             .container {
                 margin: 0;
@@ -584,11 +679,35 @@
             }
 
             .header h1 {
-                font-size: 1.8rem;
+                font-size: 1.6rem;
+                line-height: 1.2;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .video-section {
+                padding: 1.5rem 1rem;
+            }
+
+            .video-title {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
             }
 
             .progress-section {
                 padding: 1rem;
+            }
+
+            .progress-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+
+            .step-indicator {
+                width: 100%;
             }
 
             .content {
@@ -600,12 +719,53 @@
                 margin-bottom: 1.5rem;
             }
 
+            .section-title {
+                font-size: 1.2rem;
+                gap: 0.5rem;
+            }
+
             .navigation {
                 padding: 1.5rem 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                padding: 1rem 2rem;
+                font-size: 1.1rem;
             }
 
             .checkbox-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .checkbox-item {
+                padding: 1rem;
+                min-height: 55px;
+            }
+
+            .checkbox-item input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+            }
+
+            .form-group h3 {
+                font-size: 1.1rem;
+            }
+
+            .chat-header {
+                padding: 1rem;
+            }
+
+            .chat-title {
+                font-size: 1rem;
+                gap: 0.75rem;
+            }
+
+            .chat-avatar {
+                width: 36px;
+                height: 36px;
             }
 
             .chat-messages {
@@ -615,10 +775,23 @@
 
             .message-content {
                 max-width: 85%;
+                padding: 1rem 1.25rem;
             }
 
             .chat-input-container {
                 padding: 1rem;
+                gap: 0.75rem;
+            }
+
+            .chat-input {
+                font-size: 16px; /* iOS zoom prevention */
+                min-height: 45px;
+            }
+
+            .send-btn {
+                min-width: 80px;
+                min-height: 45px;
+                padding: 0.75rem 1rem;
             }
 
             .contact-button {
@@ -626,6 +799,60 @@
                 right: 1rem;
                 padding: 0.75rem 1rem;
                 font-size: 0.9rem;
+                min-height: 45px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.4rem;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+
+            .checkbox-item {
+                padding: 0.875rem;
+                min-height: 50px;
+            }
+
+            .checkbox-item label {
+                font-size: 0.95rem;
+            }
+
+            .message-content {
+                max-width: 90%;
+                padding: 0.875rem 1rem;
+            }
+
+            .contact-button {
+                font-size: 0.85rem;
+                padding: 0.625rem 0.875rem;
+            }
+        }
+
+        /* 横向きスマホ対応 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                padding: 1.5rem 1rem 1rem 1rem;
+            }
+
+            .video-section {
+                padding: 1rem;
+            }
+
+            .chat-container {
+                height: 100vh;
+            }
+
+            .chat-messages {
+                padding: 0.75rem;
+                padding-bottom: 4rem;
+            }
+
+            .contact-button {
+                bottom: 3.5rem;
             }
         }
 
@@ -650,6 +877,22 @@
             width: 24px;
             height: 24px;
             fill: currentColor;
+            flex-shrink: 0;
+        }
+
+        /* タッチデバイス用の改善 */
+        @media (hover: none) and (pointer: coarse) {
+            .checkbox-item:hover {
+                transform: none;
+            }
+            
+            .btn:hover {
+                transform: none;
+            }
+            
+            .contact-button:hover {
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
@@ -664,6 +907,21 @@
                 </div>
             </div>
 
+            <!-- YouTube動画セクション -->
+            <div class="video-section">
+                <div class="video-title">
+                    📺 使い方解説動画
+                </div>
+                <div class="video-container">
+                    <iframe 
+                        src="https://www.youtube.com/embed/GAsHcdfe8P4" 
+                        title="リフォーム提案アシスタント使い方解説"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+
             <div class="progress-section">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress-fill"></div>
@@ -673,7 +931,7 @@
                         <svg class="step-icon" id="step-icon" viewBox="0 0 24 24">
                             <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                         </svg>
-                        <span id="step-name">家族構成</span>
+                        <span id="step-name" class="step-name">家族構成</span>
                     </div>
                     <div>
                         <span id="step-text">ステップ 1 / 7</span>
@@ -716,12 +974,12 @@
                                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                             </svg>
                         </div>
-                        <div>
-                            <div>リフォーム提案アシスタント</div>
-                            <div style="font-size: 0.8rem; opacity: 0.8;">あなたの理想の住まいを一緒に考えます</div>
+                        <div class="chat-title-text">
+                            <div class="chat-title-main">リフォーム提案アシスタント</div>
+                            <div class="chat-title-sub">あなたの理想の住まいを一緒に考えます</div>
                         </div>
                     </div>
-                    <button class="btn btn-secondary" onclick="backToHearing()" style="padding: 0.5rem;">
+                    <button class="btn btn-secondary" onclick="backToHearing()" style="padding: 0.5rem; min-height: auto;">
                         <svg class="icon" viewBox="0 0 24 24">
                             <path d="M19 12H5m7-7l-7 7 7 7"/>
                         </svg>
@@ -1332,4 +1590,3 @@
     </script>
 </body>
 </html>
-
