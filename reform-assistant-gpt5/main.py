@@ -2,82 +2,106 @@ from flask import Flask, request, jsonify, send_from_directory
 import openai
 import os
 import json
+import re
 
 app = Flask(__name__, static_folder='static')
 
 # OpenAI APIキーの設定
-# 環境変数からキーを読み込むため、より安全です
 openai.api_key = os.getenv('OPENAI_API_KEY')
-# ローカルプロキシや代替エンドポイントを利用する場合
 openai.api_base = os.getenv('OPENAI_API_BASE', 'https://api.openai.com/v1')
 
 # --- 静的ファイルの配信 ---
 @app.route('/')
 def index():
-    # 'static'フォルダ内のindex.htmlを返します
     return send_from_directory(app.static_folder, 'index.html')
 
-# --- APIエンドポイント ---
+# --- ヘルパー関数 ---
+def remove_markdown(text):
+    """マークダウン記号を確実に除去する関数"""
+    # 太字、イタリック、コードブロック等を除去
+    text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # **太字**
+    text = re.sub(r'\*([^*]+)\*', r'\1', text)      # *イタリック*
+    text = re.sub(r'__([^_]+)__', r'\1', text)      # __太字__
+    text = re.sub(r'_([^_]+)_', r'\1', text)        # _イタリック_
+    text = re.sub(r'```[^`]*```', '', text)         # コードブロック
+    text = re.sub(r'`([^`]+)`', r'\1', text)        # インラインコード
+    text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)  # 見出し
+    text = re.sub(r'^[-*+]\s+', '', text, flags=re.MULTILINE)   # リスト記号
+    text = re.sub(r'^\d+\.\s+', '', text, flags=re.MULTILINE)   # 番号付きリスト
+    
+    return text.strip()
 
-# このエンドポイントはフロントエンドから直接呼び出されませんが、
-# 初期メッセージ生成のロジックとして内部で利用します。
-def generate_initial_message(form_data):
-    # フォームデータを人間が読みやすいテキストに変換
-    summary_lines = []
+def format_customer_info(form_data):
+    """顧客情報を簡潔な文字列に整形"""
+    info_parts = []
+    
     if form_data.get('familyMembers'):
-        summary_lines.append(f"家族構成: {', '.join(form_data['familyMembers'])}")
-    if form_data.get('familyAges', {}).get('main'):
-        summary_lines.append(f"主な利用者の年齢層: {form_data['familyAges']['main']}")
+        info_parts.append(f"家族構成: {', '.join(form_data['familyMembers'])}")
+    
     if form_data.get('currentAddress'):
-        summary_lines.append(f"お住まい: {form_data['currentAddress']}の{form_data.get('buildingType', '')}（築{form_data.get('buildingAge', '不明')}）")
+        building_info = f"{form_data['currentAddress']}の{form_data.get('buildingType', '住宅')}"
+        if form_data.get('buildingAge'):
+            building_info += f"（築{form_data['buildingAge']}）"
+        info_parts.append(f"お住まい: {building_info}")
     
     pets_info = [pet for pet, has_pet in form_data.get('pets', {}).items() if has_pet]
     if pets_info:
-        summary_lines.append(f"ペット: {', '.join(pets_info)}")
-
-    if form_data.get('currentIssues'):
-        summary_lines.append(f"現在の不満点: {', '.join(form_data['currentIssues'])}")
-    if form_data.get('lifestyle'):
-        summary_lines.append(f"ライフスタイル: {', '.join(form_data['lifestyle'])}")
+        info_parts.append(f"ペット: {', '.join(pets_info)}")
+    
     if form_data.get('reformAreas'):
-        summary_lines.append(f"リフォーム希望箇所: {', '.join(form_data['reformAreas'])}")
+        info_parts.append(f"リフォーム希望: {', '.join(form_data['reformAreas'])}")
+    
     if form_data.get('budget'):
-        summary_lines.append(f"ご予算: {form_data['budget']}")
-    if form_data.get('timeline'):
-        summary_lines.append(f"希望時期: {form_data['timeline']}")
-    if form_data.get('otherRequests'):
-        summary_lines.append(f"その他要望: {form_data['otherRequests']}")
+        info_parts.append(f"予算: {form_data['budget']}")
+    
+    return " / ".join(info_parts)
 
-    customer_info = "\n".join(summary_lines)
+def generate_initial_message(form_data):
+    """初回メッセージ生成"""
+    customer_summary = format_customer_info(form_data)
+    
+    # 具体的な要望を抽出
+    main_concerns = []
+    if form_data.get('currentIssues'):
+        main_concerns.extend(form_data['currentIssues'])
+    if form_data.get('lifestyle'):
+        main_concerns.extend(form_data['lifestyle'])
+    
+    prompt = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすいアドバイザーです。
 
-    # AIへの指示（プロンプト）
-    prompt = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすいリフォーム提案アシスタントです。
+お客様情報: {customer_summary}
+主な関心事: {', '.join(main_concerns[:3]) if main_concerns else '快適な住まい'}
 
-お客様の情報:
-{customer_info}
+以下のルールで初回メッセージを作成:
+1. 絶対にマークダウン記号（*、#、-、`など）を使わない
+2. 250字以内で簡潔に
+3. 絵文字を2-3個使用
+4. 「〜ですね」「〜ませんか？」など親しみやすい語尾
+5. 最後に番号付き選択肢を3つ（数字とピリオドのみ使用）
+6. 熊本の気候を考慮した提案を含める
 
-上記の情報を基に、お客様への初回メッセージを以下のルールに従って作成してください:
-1. マークダウン記号（**、##、-、*など）は一切使用しない
-2. 300字以内で簡潔に
-3. 絵文字を適度に使用（1-3個程度）
-4. 改行を使って読みやすく
-5. 親しみやすく自然な会話調
-6. お客様の情報を踏まえた具体的な提案の方向性を3つ程度提示
-7. 番号付きの選択肢で終わる（1. 2. 3.の形式）
+例文の雰囲気:
+「こんにちは！リホーム熊本です😊
+〇〇のリフォームをご検討なんですね。熊本の暑い夏も快適に過ごせるよう、一緒に理想の住まいを考えていきましょう！
+
+まずはどちらから詳しくお聞きしましょうか？
+
+1. 〇〇について
+2. △△について  
+3. □□について」
 """
 
-    # OpenAI APIを呼び出し
     response = openai.ChatCompletion.create(
         model="gpt-4o",
         messages=[
             {"role": "system", "content": prompt},
-            {"role": "user", "content": "このお客様への初回メッセージを作成してください。"}
+            {"role": "user", "content": "お客様への初回メッセージをお願いします。"}
         ],
-        max_tokens=500,
-        temperature=0.7
+        max_tokens=400,
+        temperature=0.8
     )
-    return response.choices[0].message.content.strip()
-
+    
+    return remove_markdown(response.choices[0].message.content.strip())
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -88,78 +112,97 @@ def chat():
         chat_history = data.get('chatHistory', [])
         chat_count = data.get('chatCount', 0)
 
-        # 最初のチャットの場合のみ、特別な初期メッセージを生成
+        # 初回メッセージ
         if chat_count == 0:
             assistant_response = generate_initial_message(form_data)
             return jsonify({'response': assistant_response})
 
-        # --- 2回目以降のチャットのロジック ---
-
-        # 1. 簡潔なシステムプロンプト（AIの役割定義）
-        system_prompt = """あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすい専門アドバイザーです。
-
-# 回答ルール
-- マークダウン記号は絶対に使用しない。
-- 400字以内で簡潔に、絵文字を適度に使って回答する。
-- 親しみやすい会話調を保つ。
-- 熊本の気候（湿気、夏の暑さ、冬の寒さ）や地域性を考慮した専門的な提案を行う。
-- ユーザーが選びやすいように、具体的な選択肢を3つ提示し、番号付きリストで回答を求める。
-"""
-        # 4往復目以降は問い合わせを促すルールを追加
-        if chat_count >= 4:
-            system_prompt += (
-                "\n# 追加ルール\n"
-                "会話の最後に、自然な流れで以下の問い合わせ案内を必ず含めてください:\n"
-                "「より詳しいご相談や概算のお見積もりは、こちらの公式サイトからお気軽にお問い合わせくださいね！\n"
-                "https://re-homekumamoto.com/contact/」"
-            )
-
-        # 2. 会話の前提となる顧客情報を準備
-        customer_info_summary = json.dumps(form_data, ensure_ascii=False)
+        # 2回目以降のチャット
+        customer_context = format_customer_info(form_data)
         
-        # 3. AIに渡すメッセージリストを構築
+        # より具体的で親しみやすいシステムプロンプト
+        system_prompt = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすい専門アドバイザーです。
+
+【お客様情報】
+{customer_context}
+
+【重要な応答ルール】
+1. マークダウン記号（*、**、#、-、`、_、[]()など）は絶対に使用禁止
+2. 強調したい部分は「」で囲む
+3. 350字以内で簡潔に回答
+4. 絵文字を1-3個自然に使用（😊 💡 🏠 ✨ 👍 など）
+5. 「〜ですね」「〜ませんか？」など親しみやすい語尾を使用
+6. 熊本の気候（湿気、夏の暑さ、台風）を考慮した実用的な提案
+
+【会話の進め方】
+- お客様の回答に共感を示してから提案する
+- 専門用語は使わず、分かりやすい言葉で説明
+- 常に3つの選択肢を数字で提示（1. 2. 3.の形式のみ）
+- 選択肢は具体的で選びやすいものにする
+
+【例文の口調】
+「なるほど、〇〇が気になるんですね！熊本の夏は特に暑いので、その点も考慮した提案をさせていただきますね😊」"""
+
+        # 4往復目以降は問い合わせを促す
+        if chat_count >= 4:
+            system_prompt += """
+
+【追加】会話の最後に自然に以下を追加:
+「詳しいご相談やお見積もりは、お気軽にこちらからどうぞ！
+https://re-homekumamoto.com/contact/」"""
+
+        # メッセージリストの構築（よりシンプルに）
         messages = [
-            {"role": "system", "content": system_prompt},
-            # 顧客情報は会話の冒頭に一度だけ「ユーザー」の発言として注入する
-            {"role": "user", "content": f"（これはシステムへの指示です。ユーザーには見えません。以下の顧客情報を基に会話を進めてください: {customer_info_summary}）"},
-            {"role": "assistant", "content": "承知いたしました。お客様の情報に基づいて、最適なリフォーム提案をさせていただきます。"}
+            {"role": "system", "content": system_prompt}
         ]
         
-        # 過去の会話履歴を追加（直近12件 = 6往復分）
-        # これで5往復以上の会話も記憶できます
-        messages.extend(chat_history[-12:])
-
-        # 今回のユーザーメッセージを追加
+        # 会話履歴を追加（最大16件 = 8往復分）
+        if len(chat_history) > 0:
+            messages.extend(chat_history[-16:])
+        
+        # 現在のユーザーメッセージを追加
         messages.append({"role": "user", "content": user_message})
 
-        # OpenAI APIを呼び出し
+        # OpenAI API呼び出し
         response = openai.ChatCompletion.create(
             model="gpt-4o",
             messages=messages,
-            max_tokens=600,  # 少し長めの回答も許容
-            temperature=0.7
+            max_tokens=500,
+            temperature=0.8,  # より自然な会話のため少し上げる
+            presence_penalty=0.3,  # 繰り返しを避ける
+            frequency_penalty=0.3  # 同じフレーズの使用を抑制
         )
-        assistant_response = response.choices[0].message.content.strip()
-
+        
+        # レスポンスからマークダウンを除去
+        assistant_response = remove_markdown(response.choices[0].message.content.strip())
+        
+        # 番号付きリストの形式を統一（念のため）
+        assistant_response = re.sub(r'(\d+)\s*[.．。]\s*', r'\1. ', assistant_response)
+        
         return jsonify({'response': assistant_response})
 
+    except openai.error.RateLimitError:
+        error_message = (
+            "申し訳ございません、現在多くのお問い合わせをいただいております😅\n\n"
+            "少しお待ちいただくか、直接お問い合わせいただけますか？\n\n"
+            "お急ぎの場合はこちらから:\n"
+            "https://re-homekumamoto.com/contact/"
+        )
+        return jsonify({'response': error_message, 'status': 'rate_limit'}), 429
+        
     except Exception as e:
         print(f"Error in chat endpoint: {str(e)}")
-        # エラー発生時もユーザーに選択肢を与える丁寧な応答を返す
         error_message = (
-            "申し訳ございません、一時的にシステムエラーが発生しました。😅\n\n"
-            "少し時間をおいてから、もう一度メッセージを送っていただけますか？\n\n"
-            "もし問題が解決しない場合は、公式サイトのフォームから直接お問い合わせいただけますと幸いです。"
+            "申し訳ございません、一時的にエラーが発生しました😣\n\n"
+            "お手数ですが、以下からお問い合わせいただけますか？\n\n"
+            "https://re-homekumamoto.com/contact/"
         )
         return jsonify({'response': error_message, 'status': 'error'}), 500
 
-# サーバーの死活監視用エンドポイント
 @app.route('/health')
 def health():
     return jsonify({'status': 'healthy'})
 
 if __name__ == '__main__':
-    # RenderやHerokuなどのPaaS環境に対応するため、PORTを環境変数から取得
     port = int(os.environ.get('PORT', 5000))
-    # debug=Falseは本番環境での運用に推奨されます
     app.run(host='0.0.0.0', port=port, debug=False)
