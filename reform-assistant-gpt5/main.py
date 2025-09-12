@@ -23,11 +23,7 @@ def remove_markdown(text):
     text = re.sub(r'\*([^*]+)\*', r'\1', text)      # *イタリック*
     text = re.sub(r'__([^_]+)__', r'\1', text)      # __太字__
     text = re.sub(r'_([^_]+)_', r'\1', text)        # _イタリック_
-    text = re.sub(r'```[^`]*```', '', text)         # コードブロック
-    text = re.sub(r'`([^`]+)`', r'\1', text)        # インラインコード
-    text = re.sub(r'^#{1,6}\s+', '', text, flags=re.MULTILINE)  # 見出し
-    text = re.sub(r'^[-*+]\s+', '', text, flags=re.MULTILINE)   # リスト記号
-    text = re.sub(r'^\d+\.\s+', '', text, flags=re.MULTILINE)   # 番号付きリスト
+
     
     return text.strip()
 
@@ -72,9 +68,10 @@ def generate_initial_message(form_data):
 お客様情報: {customer_summary}
 主な関心事: {', '.join(main_concerns[:3]) if main_concerns else '快適な住まい'}
 
-リホーム熊本の会社情報
+リホーム熊本の情報(聞かれたら答える)
 所在地： 〒861-8038 熊本県熊本市東区長嶺東５丁目８−１０
 電話番号： 0120-182-471
+
 
 以下のルールで初回メッセージを作成:
 1. 絶対にマークダウン記号（*、#、-、`など）を使わない
