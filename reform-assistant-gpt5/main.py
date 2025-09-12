@@ -6,67 +6,57 @@ import json
 app = Flask(__name__, static_folder='static')
 
 # OpenAI APIキーの設定
+# 環境変数からキーを読み込むため、より安全です
 openai.api_key = os.getenv('OPENAI_API_KEY')
+# ローカルプロキシや代替エンドポイントを利用する場合
 openai.api_base = os.getenv('OPENAI_API_BASE', 'https://api.openai.com/v1')
 
+# --- 静的ファイルの配信 ---
 @app.route('/')
 def index():
+    # 'static'フォルダ内のindex.htmlを返します
     return send_from_directory(app.static_folder, 'index.html')
 
-@app.route('/api/initial-message', methods=['POST'])
-def initial_message():
-    try:
-        data = request.get_json()
-        form_data = data.get('formData', {})
-        
-        # フォームデータを整理
-        family_info = []
-        if form_data.get('familyMembers'):
-            family_info.append(f"家族構成: {', '.join(form_data['familyMembers'])}")
-        if form_data.get('familyAges', {}).get('main'):
-            family_info.append(f"年齢層: {form_data['familyAges']['main']}")
-        
-        building_info = []
-        if form_data.get('currentAddress'):
-            building_info.append(f"住所: {form_data['currentAddress']}")
-        if form_data.get('buildingType'):
-            building_info.append(f"建物: {form_data['buildingType']}")
-        if form_data.get('buildingAge'):
-            building_info.append(f"築年数: {form_data['buildingAge']}")
-        
-        pets_info = []
-        if form_data.get('pets'):
-            for pet, has_pet in form_data['pets'].items():
-                if has_pet:
-                    pets_info.append(pet)
-        
-        issues_info = form_data.get('currentIssues', [])
-        lifestyle_info = form_data.get('lifestyle', [])
-        reform_areas = form_data.get('reformAreas', [])
-        
-        budget_info = []
-        if form_data.get('budget'):
-            budget_info.append(f"予算: {form_data['budget']}")
-        if form_data.get('timeline'):
-            budget_info.append(f"時期: {form_data['timeline']}")
-        
-        other_requests = form_data.get('otherRequests', '')
-        
-        # プロンプトを作成
-        prompt = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすいリフォーム提案アシスタントです。
+# --- APIエンドポイント ---
+
+# このエンドポイントはフロントエンドから直接呼び出されませんが、
+# 初期メッセージ生成のロジックとして内部で利用します。
+def generate_initial_message(form_data):
+    # フォームデータを人間が読みやすいテキストに変換
+    summary_lines = []
+    if form_data.get('familyMembers'):
+        summary_lines.append(f"家族構成: {', '.join(form_data['familyMembers'])}")
+    if form_data.get('familyAges', {}).get('main'):
+        summary_lines.append(f"主な利用者の年齢層: {form_data['familyAges']['main']}")
+    if form_data.get('currentAddress'):
+        summary_lines.append(f"お住まい: {form_data['currentAddress']}の{form_data.get('buildingType', '')}（築{form_data.get('buildingAge', '不明')}）")
+    
+    pets_info = [pet for pet, has_pet in form_data.get('pets', {}).items() if has_pet]
+    if pets_info:
+        summary_lines.append(f"ペット: {', '.join(pets_info)}")
+
+    if form_data.get('currentIssues'):
+        summary_lines.append(f"現在の不満点: {', '.join(form_data['currentIssues'])}")
+    if form_data.get('lifestyle'):
+        summary_lines.append(f"ライフスタイル: {', '.join(form_data['lifestyle'])}")
+    if form_data.get('reformAreas'):
+        summary_lines.append(f"リフォーム希望箇所: {', '.join(form_data['reformAreas'])}")
+    if form_data.get('budget'):
+        summary_lines.append(f"ご予算: {form_data['budget']}")
+    if form_data.get('timeline'):
+        summary_lines.append(f"希望時期: {form_data['timeline']}")
+    if form_data.get('otherRequests'):
+        summary_lines.append(f"その他要望: {form_data['otherRequests']}")
+
+    customer_info = "\n".join(summary_lines)
+
+    # AIへの指示（プロンプト）
+    prompt = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすいリフォーム提案アシスタントです。
 
 お客様の情報:
-{chr(10).join(family_info) if family_info else ''}
-{chr(10).join(building_info) if building_info else ''}
-{'ペット: ' + ', '.join(pets_info) if pets_info else 'ペット: なし'}
-{'現在の不満: ' + ', '.join(issues_info) if issues_info else ''}
-{'ライフスタイル: ' + ', '.join(lifestyle_info) if lifestyle_info else ''}
-{'リフォーム希望箇所: ' + ', '.join(reform_areas) if reform_areas else ''}
-{chr(10).join(budget_info) if budget_info else ''}
-{'その他要望: ' + other_requests if other_requests else ''}
+{customer_info}
 
-以下のルールに従って初回メッセージを作成してください:
-
+上記の情報を基に、お客様への初回メッセージを以下のルールに従って作成してください:
 1. マークダウン記号（**、##、-、*など）は一切使用しない
 2. 300字以内で簡潔に
 3. 絵文字を適度に使用（1-3個程度）
@@ -74,120 +64,21 @@ def initial_message():
 5. 親しみやすく自然な会話調
 6. お客様の情報を踏まえた具体的な提案の方向性を3つ程度提示
 7. 番号付きの選択肢で終わる（1. 2. 3.の形式）
-
-例:
-こんにちは！😊
-ヒアリングありがとうございました。
-
-○○様のご家族構成とご希望を拝見させていただき、
-いくつかの素敵なプランが思い浮かびました！
-
-特におすすめしたいのは以下の3つです：
-
-1. △△を重視した機能的なリフォーム
-2. □□を活かしたデザイン重視のリフォーム  
-3. ◇◇に配慮したバリアフリーリフォーム
-
-どちらに一番興味がおありでしょうか？🏠
 """
-        
-        # OpenAI APIを呼び出し
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=[
-                {"role": "system", "content": prompt},
-                {"role": "user", "content": "初回メッセージをお願いします"}
-            ],
-            max_tokens=500,
-            temperature=0.7
-        )
-        
-        assistant_message = response.choices[0].message.content.strip()
-        
-        return jsonify({
-            'response': assistant_message
-        })
-        
-    except Exception as e:
-        print(f"Error in initial_message: {str(e)}")
-        return jsonify({
-            'error': 'エラーが発生しました',
-            'response': 'こんにちは！😊\nリフォーム提案アシスタントです。\n\nヒアリング内容を確認させていただき、\nあなたにぴったりのリフォームプランを\nご提案させていただきますね！\n\nまずは、どのような点を\n一番重視されたいでしょうか？\n\n1. 機能性・使いやすさ\n2. デザイン・見た目\n3. コストパフォーマンス\n\n番号でお答えください！🏠'
-        }), 500
 
-@app.route('/api/chat', methods=['POST'])
-def api_chat():
-    try:
-        data = request.get_json()
-        messages = data.get('messages', [])
-        chat_count = data.get('chatCount', 0)
-        
-        # システムプロンプト
-        system_prompt = """あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすいリフォーム提案アシスタントです。
+    # OpenAI APIを呼び出し
+    response = openai.ChatCompletion.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": "このお客様への初回メッセージを作成してください。"}
+        ],
+        max_tokens=500,
+        temperature=0.7
+    )
+    return response.choices[0].message.content.strip()
 
-以下のルールに従って回答してください:
 
-1. マークダウン記号（**、##、-、*など）は一切使用しない
-2. 400字以内で簡潔に
-3. 絵文字を適度に使用
-4. 改行を使って読みやすく
-5. 親しみやすく自然な会話調
-6. リフォームの専門知識を活かした具体的なアドバイス
-7. 熊本の気候や住環境を考慮した提案
-8. 能動的に理想の具体的なリフォームプランを提案する
-9. できるだけ番号付きの選択肢で回答を求める（1. 2. 3.の形式）
-10. ユーザーが選択しやすいよう、具体的な選択肢を提示する
-
-回答例:
-そうですね！😊
-キッチンのリフォームでしたら、
-熊本の湿気対策も大切ですね。
-
-あなたのご希望に合わせて、
-こんなプランはいかがでしょうか？
-
-1. 対面キッチンで家族との会話を重視
-2. アイランドキッチンで開放感を演出
-3. 壁付けキッチンで収納力をアップ
-
-どのスタイルがお気に入りでしょうか？🏠"""
-
-        # 4往復目の場合は、URL案内を含める
-        if chat_count >= 4:
-            system_prompt += """
-
-重要: 4往復目以降は、回答の最後に自然な流れで以下のURL案内を含めてください:
-「より詳しいご相談は、こちらからお気軽にお問い合わせください
-https://re-homekumamoto.com/contact/」
-
-この案内は自然な会話の流れの中で、押し付けがましくなく案内してください。"""
-        
-        # メッセージリストを準備
-        api_messages = [{"role": "system", "content": system_prompt}]
-        api_messages.extend(messages)
-        
-        # OpenAI APIを呼び出し
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=api_messages,
-            max_tokens=500,
-            temperature=0.7
-        )
-        
-        assistant_message = response.choices[0].message.content.strip()
-        
-        return jsonify({
-            'response': assistant_message
-        })
-        
-    except Exception as e:
-        print(f"Error in api_chat: {str(e)}")
-        return jsonify({
-            'error': 'エラーが発生しました',
-            'response': '申し訳ございません。😅\n一時的にエラーが発生しました。\n\nしばらくしてから再度お試しいただくか、\n以下からお選びください：\n\n1. もう一度質問する\n2. 別の話題に変える\n3. 直接お電話で相談する\n\nどちらがよろしいでしょうか？🏠'
-        }), 500
-
-# フロントエンド用の /chat エンドポイントを追加
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
@@ -196,81 +87,79 @@ def chat():
         form_data = data.get('formData', {})
         chat_history = data.get('chatHistory', [])
         chat_count = data.get('chatCount', 0)
-        
-        # フォームデータを整理
-        family_info = "、".join(form_data.get('familyMembers', [])) if form_data.get('familyMembers') else "情報なし"
-        building_info = f"{form_data.get('buildingType', '未選択')}（築{form_data.get('buildingAge', '不明')}）"
-        reform_areas = "、".join(form_data.get('reformAreas', [])) if form_data.get('reformAreas') else "未選択"
-        budget = form_data.get('budget', '未定')
-        timeline = form_data.get('timeline', '未定')
-        current_issues = "、".join(form_data.get('currentIssues', [])) if form_data.get('currentIssues') else "特になし"
-        lifestyle = "、".join(form_data.get('lifestyle', [])) if form_data.get('lifestyle') else "情報なし"
-        
-        # システムプロンプト
-        system_prompt = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の専門アドバイザーです。
 
-お客様情報：
-- 家族構成: {family_info}
-- 建物情報: {building_info}
-- 住所: {form_data.get('currentAddress', '未選択')}
-- リフォーム希望箇所: {reform_areas}
-- 予算: {budget}
-- 希望時期: {timeline}
-- 現在の不満: {current_issues}
-- ライフスタイル: {lifestyle}
-- その他要望: {form_data.get('otherRequests', 'なし')}
+        # 最初のチャットの場合のみ、特別な初期メッセージを生成
+        if chat_count == 0:
+            assistant_response = generate_initial_message(form_data)
+            return jsonify({'response': assistant_response})
 
-回答ルール：
-1. 300字以内で回答
-2. マークダウン記号（**、##、-、*など）は使用禁止
-3. 絵文字を1-3個使用
-4. 改行を使って読みやすく
-5. 親しみやすい自然な会話調
-6. 具体的な提案は3つの選択肢で番号付き
-7. 熊本の気候や住環境を考慮した専門的アドバイス
+        # --- 2回目以降のチャットのロジック ---
 
-現在のチャット回数: {chat_count}回目"""
+        # 1. 簡潔なシステムプロンプト（AIの役割定義）
+        system_prompt = """あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすい専門アドバイザーです。
 
-        # 4往復目以降の場合、URL案内を含める
+# 回答ルール
+- マークダウン記号は絶対に使用しない。
+- 400字以内で簡潔に、絵文字を適度に使って回答する。
+- 親しみやすい会話調を保つ。
+- 熊本の気候（湿気、夏の暑さ、冬の寒さ）や地域性を考慮した専門的な提案を行う。
+- ユーザーが選びやすいように、具体的な選択肢を3つ提示し、番号付きリストで回答を求める。
+"""
+        # 4往復目以降は問い合わせを促すルールを追加
         if chat_count >= 4:
-            system_prompt += "\n\n重要: この回答で自然にhttps://re-homekumamoto.com/contact/への問い合わせを案内してください。"
+            system_prompt += (
+                "\n# 追加ルール\n"
+                "会話の最後に、自然な流れで以下の問い合わせ案内を必ず含めてください:\n"
+                "「より詳しいご相談や概算のお見積もりは、こちらの公式サイトからお気軽にお問い合わせくださいね！\n"
+                "https://re-homekumamoto.com/contact/」"
+            )
+
+        # 2. 会話の前提となる顧客情報を準備
+        customer_info_summary = json.dumps(form_data, ensure_ascii=False)
         
-        # チャット履歴を構築
-        messages = [{"role": "system", "content": system_prompt}]
+        # 3. AIに渡すメッセージリストを構築
+        messages = [
+            {"role": "system", "content": system_prompt},
+            # 顧客情報は会話の冒頭に一度だけ「ユーザー」の発言として注入する
+            {"role": "user", "content": f"（これはシステムへの指示です。ユーザーには見えません。以下の顧客情報を基に会話を進めてください: {customer_info_summary}）"},
+            {"role": "assistant", "content": "承知いたしました。お客様の情報に基づいて、最適なリフォーム提案をさせていただきます。"}
+        ]
         
-        # 過去のチャット履歴を追加
-        for msg in chat_history[-10:]:  # 最新10件のみ
-            messages.append({"role": msg['role'], "content": msg['content']})
-        
-        # 現在のユーザーメッセージを追加
+        # 過去の会話履歴を追加（直近12件 = 6往復分）
+        # これで5往復以上の会話も記憶できます
+        messages.extend(chat_history[-12:])
+
+        # 今回のユーザーメッセージを追加
         messages.append({"role": "user", "content": user_message})
-        
+
         # OpenAI APIを呼び出し
         response = openai.ChatCompletion.create(
             model="gpt-4o",
             messages=messages,
-            max_tokens=500,
+            max_tokens=600,  # 少し長めの回答も許容
             temperature=0.7
         )
-        
         assistant_response = response.choices[0].message.content.strip()
-        
-        return jsonify({
-            'response': assistant_response,
-            'status': 'success'
-        })
-        
+
+        return jsonify({'response': assistant_response})
+
     except Exception as e:
         print(f"Error in chat endpoint: {str(e)}")
-        return jsonify({
-            'response': '申し訳ございません。一時的にエラーが発生しました。😅\n\nしばらく時間をおいてから再度お試しください。\n\nお急ぎの場合は、直接お問い合わせフォームからご連絡ください。',
-            'status': 'error'
-        }), 500
+        # エラー発生時もユーザーに選択肢を与える丁寧な応答を返す
+        error_message = (
+            "申し訳ございません、一時的にシステムエラーが発生しました。😅\n\n"
+            "少し時間をおいてから、もう一度メッセージを送っていただけますか？\n\n"
+            "もし問題が解決しない場合は、公式サイトのフォームから直接お問い合わせいただけますと幸いです。"
+        )
+        return jsonify({'response': error_message, 'status': 'error'}), 500
 
+# サーバーの死活監視用エンドポイント
 @app.route('/health')
 def health():
-    return jsonify({'status': 'healthy', 'model': 'gpt-4o'})
+    return jsonify({'status': 'healthy'})
 
 if __name__ == '__main__':
+    # RenderやHerokuなどのPaaS環境に対応するため、PORTを環境変数から取得
     port = int(os.environ.get('PORT', 5000))
+    # debug=Falseは本番環境での運用に推奨されます
     app.run(host='0.0.0.0', port=port, debug=False)
