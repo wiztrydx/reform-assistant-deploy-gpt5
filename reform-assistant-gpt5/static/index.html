@@ -6,6 +6,7 @@
     <title>リフォーム提案アシスタント - リフォーム熊本</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
+        /* スタイルは変更なしのため省略（同じものを使用） */
         * {
             margin: 0;
             padding: 0;
@@ -1470,41 +1471,53 @@
             }
         }
 
-        // チャット機能
-        function startChat() {
+        // チャット機能 - 初回メッセージもサーバーから取得するように修正
+        async function startChat() {
             document.getElementById('hearing-screen').classList.add('hidden');
             document.getElementById('chat-screen').classList.remove('hidden');
             
-            // 初期メッセージを表示
-            const initialMessage = generateInitialMessage();
-            addMessage('assistant', initialMessage);
+            // ローディング表示
+            showLoadingMessage();
+            
+            try {
+                // 初回メッセージをサーバーから取得（chatCount=0として送信）
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: '',  // 初回は空メッセージ
+                        formData: formData,
+                        chatHistory: [],
+                        chatCount: 0  // 初回メッセージであることを示す
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const data = await response.json();
+                
+                // ローディングを削除
+                removeLoadingMessage();
+                
+                // AIからの初回メッセージを追加
+                addMessage('assistant', data.response);
+                
+            } catch (error) {
+                console.error('Error:', error);
+                removeLoadingMessage();
+                // エラー時のフォールバック
+                addMessage('assistant', 'お客様の情報を確認させていただきました。どのようなリフォームをお考えでしょうか？');
+            }
             
             // ホバーボタンを表示
             setTimeout(() => {
                 const contactButton = document.getElementById('contact-button');
                 contactButton.classList.add('show');
             }, 1000);
-        }
-
-        function generateInitialMessage() {
-            const familyInfo = formData.familyMembers.length > 0 ? formData.familyMembers.join('、') : '情報なし';
-            const reformAreas = formData.reformAreas.length > 0 ? formData.reformAreas.join('、') : '未選択';
-            const budget = formData.budget || '未定';
-            
-            return `こんにちは！😊
-ヒアリングありがとうございました。
-
-${familyInfo}でお住まいで、${reformAreas}のリフォームをご検討なんですね。
-
-ご予算${budget}で、素敵なプランをいくつか思い浮かびました！
-
-特におすすめしたいのは以下の3つです：
-
-1. 機能性を重視した実用的なリフォーム
-2. デザイン性を活かした美しいリフォーム  
-3. 家族の成長に配慮した将来対応リフォーム
-
-どちらに一番興味がおありでしょうか？🏠`;
         }
 
         async function sendMessage() {
