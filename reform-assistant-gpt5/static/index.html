@@ -31,42 +31,39 @@
 
         /* ロゴセクション */
         .logo-section {
-            background: white;
-            padding: 1rem 2rem;
-            border-bottom: 1px solid #e2e8f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .logo-item {
-            display: flex;
-            align-items: center;
-            opacity: 0.9;
-            transition: opacity 0.3s ease;
-        }
-
-        .logo-item:hover {
-            opacity: 1;
+            padding: 1rem 2rem;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
         }
 
         .logo-rehome {
             height: 40px;
-            width: auto;
+            transition: opacity 0.3s ease;
         }
 
-        .logo-rinozent {
-            height: 45px;
-            width: auto;
+        .logo-rinozent-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .powered-by {
             font-size: 0.75rem;
             color: #64748b;
-            margin-right: 0.5rem;
             font-weight: 500;
+        }
+
+        .logo-rinozent {
+            height: 45px;
+            transition: opacity 0.3s ease;
+        }
+
+        .logo-rehome:hover,
+        .logo-rinozent:hover {
+            opacity: 0.8;
         }
 
         /* ヘッダー - 高さを調整してURL表示領域を確保 */
@@ -714,17 +711,13 @@
             }
 
             .logo-section {
-                padding: 0.75rem 1rem;
                 flex-direction: column;
-                gap: 0.75rem;
+                gap: 1rem;
+                padding: 1rem;
             }
 
-            .logo-rehome {
-                height: 35px;
-            }
-
-            .logo-rinozent {
-                height: 40px;
+            .logo-rinozent-container {
+                align-self: flex-end;
             }
 
             .header {
@@ -858,18 +851,6 @@
         }
 
         @media (max-width: 480px) {
-            .logo-section {
-                padding: 0.5rem;
-            }
-
-            .logo-rehome {
-                height: 30px;
-            }
-
-            .logo-rinozent {
-                height: 35px;
-            }
-
             .header h1 {
                 font-size: 1.4rem;
             }
@@ -968,20 +949,17 @@
         <div id="hearing-screen">
             <!-- ロゴセクション -->
             <div class="logo-section">
-                <div class="logo-item">
-                    <img src="/static/logo-rehome.png" class="logo-rehome" alt="リホーム熊本">
-                </div>
-                <div class="logo-item">
+                <img src="/static/logo-rehome.png" class="logo-rehome" alt="リホーム熊本">
+                <div class="logo-rinozent-container">
                     <span class="powered-by">Powered by</span>
                     <img src="/static/logo-rinozent.png" class="logo-rinozent" alt="リノゼント">
                 </div>
             </div>
 
-            <!-- ヘッダー -->
             <div class="header">
                 <div class="header-content">
                     <h1>🏠 リフォーム提案アシスタント</h1>
-                    <p>あなたの理想の住まいを一緒に考えます</p>
+                    <p>簡単なヒアリングを通じて、あなたにぴったりのリフォームプランをご提案します</p>
                 </div>
             </div>
 
@@ -1000,37 +978,45 @@
                 </div>
             </div>
 
-            <!-- プログレス -->
             <div class="progress-section">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progress-fill"></div>
                 </div>
                 <div class="progress-info">
-                    <div class="step-indicator" id="step-indicator">
-                        <svg class="step-icon" viewBox="0 0 24 24">
-                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    <div class="step-indicator">
+                        <svg class="step-icon" id="step-icon" viewBox="0 0 24 24">
+                            <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                         </svg>
-                        <span class="step-name" id="step-name">ステップ 1 / 7</span>
+                        <span id="step-name" class="step-name">家族構成</span>
                     </div>
-                    <div id="progress-text">0%</div>
+                    <div>
+                        <span id="step-text">ステップ 1 / 7</span>
+                        <span id="progress-percent" style="margin-left: 1rem; font-weight: 600;">14%</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- メインコンテンツ -->
             <div class="content">
-                <div class="section-card" id="step-content">
-                    <!-- ステップ内容がここに動的に挿入されます -->
+                <div class="section-card">
+                    <div id="step-content">
+                        <!-- ステップコンテンツがここに動的に挿入されます -->
+                    </div>
                 </div>
+            </div>
 
-                <!-- ナビゲーション -->
-                <div class="navigation">
-                    <button class="btn btn-secondary" id="prev-btn" onclick="previousStep()" disabled>
-                        ← 前へ
-                    </button>
-                    <button class="btn btn-primary" id="next-btn" onclick="nextStep()">
-                        次へ →
-                    </button>
-                </div>
+            <div class="navigation">
+                <button class="btn btn-secondary" id="prev-btn" onclick="prevStep()" disabled>
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M19 12H5m7-7l-7 7 7 7"/>
+                    </svg>
+                    前へ
+                </button>
+                <button class="btn btn-primary" id="next-btn" onclick="nextStep()">
+                    次へ
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M5 12h14m-7-7l7 7-7 7"/>
+                    </svg>
+                </button>
             </div>
         </div>
 
@@ -1039,568 +1025,507 @@
             <div class="chat-container">
                 <div class="chat-header">
                     <div class="chat-title">
-                        <div class="chat-avatar">🏠</div>
+                        <div class="chat-avatar">
+                            <svg class="icon" viewBox="0 0 24 24">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                            </svg>
+                        </div>
                         <div class="chat-title-text">
                             <div class="chat-title-main">リフォーム提案アシスタント</div>
-                            <div class="chat-title-sub">あなた専用のリフォームプランをご提案</div>
+                            <div class="chat-title-sub">あなたの理想の住まいを一緒に考えます</div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="chat-messages" id="chat-messages">
-                    <!-- メッセージがここに動的に追加されます -->
+                    <button class="btn btn-secondary" onclick="backToHearing()" style="padding: 0.5rem; min-height: auto;">
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M19 12H5m7-7l-7 7 7 7"/>
+                        </svg>
+                    </button>
                 </div>
 
-                <!-- ホバー問い合わせボタン -->
-                <a href="https://re-homekumamoto.com/contact/" target="_blank" class="contact-button" id="contact-button">
-                    🏠 詳しくはこちら
-                </a>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- チャットメッセージがここに表示されます -->
+                </div>
 
                 <div class="chat-input-container">
-                    <input type="text" class="chat-input" id="chat-input" placeholder="メッセージを入力してください..." onkeypress="handleKeyPress(event)">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="メッセージを入力してください..." onkeypress="handleChatKeyPress(event)">
                     <button class="send-btn" id="send-btn" onclick="sendMessage()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="m22 2-7 20-4-9-9-4z"/>
-                            <path d="M22 2 11 13"/>
+                        <!-- 新しいセンスの良い送信アイコン -->
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                         </svg>
                         送信
                     </button>
                 </div>
+
+                <!-- ホバー問い合わせボタン - 送信ボタンの少し上に配置 -->
+                <a href="https://re-homekumamoto.com/contact/" target="_blank" class="contact-button" id="contact-button">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/>
+                    </svg>
+                    詳しくはこちら
+                </a>
             </div>
         </div>
     </div>
 
     <script>
         // グローバル変数
-        let currentStep = 1;
-        let totalSteps = 7;
-        let hearingData = {};
-        let chatCount = 0;
+        let currentStep = 0;
+        let chatCount = 0; // チャット往復回数をカウント
+        let formData = {
+            familyMembers: [],
+            familyAges: {},
+            pets: {},
+            currentAddress: '',
+            buildingType: '',
+            buildingAge: '',
+            currentIssues: [],
+            lifestyle: [],
+            reformAreas: [],
+            budget: '',
+            timeline: '',
+            otherRequests: ''
+        };
 
-        // ステップ定義
         const steps = [
             {
-                title: "👨‍👩‍👧‍👦 家族構成について",
-                description: "ご家族の構成を教えてください。",
-                content: `
-                    <div class="form-group">
-                        <h3>👨‍👩‍👧‍👦 ご家族の構成</h3>
-                        <div class="checkbox-grid">
-                            <div class="checkbox-item" data-field="family" data-value="夫婦のみ">
-                                <input type="checkbox" id="family_couple">
-                                <label for="family_couple">夫婦のみ</label>
-                            </div>
-                            <div class="checkbox-item" data-field="family" data-value="夫婦+未就学児">
-                                <input type="checkbox" id="family_young">
-                                <label for="family_young">夫婦+未就学児</label>
-                            </div>
-                            <div class="checkbox-item" data-field="family" data-value="夫婦+小中学生">
-                                <input type="checkbox" id="family_school">
-                                <label for="family_school">夫婦+小中学生</label>
-                            </div>
-                            <div class="checkbox-item" data-field="family" data-value="夫婦+高校生以上">
-                                <input type="checkbox" id="family_teen">
-                                <label for="family_teen">夫婦+高校生以上</label>
-                            </div>
-                            <div class="checkbox-item" data-field="family" data-value="三世代同居">
-                                <input type="checkbox" id="family_multi">
-                                <label for="family_multi">三世代同居</label>
-                            </div>
-                            <div class="checkbox-item" data-field="family" data-value="単身">
-                                <input type="checkbox" id="family_single">
-                                <label for="family_single">単身</label>
-                            </div>
-                        </div>
-                    </div>
-                `
+                title: '家族構成',
+                icon: 'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
+                render: renderFamilyStep
             },
             {
-                title: "🏠 住所・建物情報",
-                description: "お住まいの地域と建物の基本情報を教えてください。",
-                content: `
-                    <div class="form-group">
-                        <h3>📍 お住まいの地域</h3>
-                        <div class="select-group">
-                            <label for="location">熊本県内の地域</label>
-                            <select id="location" data-field="location">
-                                <option value="">選択してください</option>
-                                <option value="熊本市中央区">熊本市中央区</option>
-                                <option value="熊本市東区">熊本市東区</option>
-                                <option value="熊本市西区">熊本市西区</option>
-                                <option value="熊本市南区">熊本市南区</option>
-                                <option value="熊本市北区">熊本市北区</option>
-                                <option value="八代市">八代市</option>
-                                <option value="人吉市">人吉市</option>
-                                <option value="荒尾市">荒尾市</option>
-                                <option value="水俣市">水俣市</option>
-                                <option value="玉名市">玉名市</option>
-                                <option value="山鹿市">山鹿市</option>
-                                <option value="菊池市">菊池市</option>
-                                <option value="宇土市">宇土市</option>
-                                <option value="上天草市">上天草市</option>
-                                <option value="宇城市">宇城市</option>
-                                <option value="阿蘇市">阿蘇市</option>
-                                <option value="天草市">天草市</option>
-                                <option value="合志市">合志市</option>
-                                <option value="その他">その他</option>
-                            </select>
-                        </div>
-                        <div class="select-group">
-                            <label for="building_age">築年数</label>
-                            <select id="building_age" data-field="building_age">
-                                <option value="">選択してください</option>
-                                <option value="5年未満">5年未満</option>
-                                <option value="5-10年">5-10年</option>
-                                <option value="10-20年">10-20年</option>
-                                <option value="20-30年">20-30年</option>
-                                <option value="30年以上">30年以上</option>
-                            </select>
-                        </div>
-                        <div class="select-group">
-                            <label for="building_type">建物構造</label>
-                            <select id="building_type" data-field="building_type">
-                                <option value="">選択してください</option>
-                                <option value="木造">木造</option>
-                                <option value="鉄骨造">鉄骨造</option>
-                                <option value="RC造">RC造（鉄筋コンクリート）</option>
-                                <option value="その他">その他</option>
-                            </select>
-                        </div>
-                    </div>
-                `
+                title: '住所・建物',
+                icon: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+                render: renderBuildingStep
             },
             {
-                title: "🐕 ペットについて",
-                description: "ペットを飼われていますか？",
-                content: `
-                    <div class="form-group">
-                        <h3>🐕 ペットの有無</h3>
-                        <div class="checkbox-grid">
-                            <div class="checkbox-item" data-field="pets" data-value="飼っていない">
-                                <input type="checkbox" id="pets_none">
-                                <label for="pets_none">飼っていない</label>
-                            </div>
-                            <div class="checkbox-item" data-field="pets" data-value="小型犬">
-                                <input type="checkbox" id="pets_small_dog">
-                                <label for="pets_small_dog">小型犬</label>
-                            </div>
-                            <div class="checkbox-item" data-field="pets" data-value="中大型犬">
-                                <input type="checkbox" id="pets_large_dog">
-                                <label for="pets_large_dog">中大型犬</label>
-                            </div>
-                            <div class="checkbox-item" data-field="pets" data-value="猫">
-                                <input type="checkbox" id="pets_cat">
-                                <label for="pets_cat">猫</label>
-                            </div>
-                            <div class="checkbox-item" data-field="pets" data-value="その他">
-                                <input type="checkbox" id="pets_other">
-                                <label for="pets_other">その他（鳥、魚など）</label>
-                            </div>
-                        </div>
-                    </div>
-                `
+                title: 'ペット',
+                icon: 'M4.5 9.5C4.5 8.12 5.62 7 7 7s2.5 1.12 2.5 2.5S8.38 12 7 12s-2.5-1.12-2.5-2.5zM17 7c1.38 0 2.5 1.12 2.5 2.5S18.38 12 17 12s-2.5-1.12-2.5-2.5S15.62 7 17 7z',
+                render: renderPetStep
             },
             {
-                title: "😟 現在の住環境の不満",
-                description: "現在のお住まいで気になる点を教えてください。",
-                content: `
-                    <div class="form-group">
-                        <h3>😟 改善したい点</h3>
-                        <div class="checkbox-grid">
-                            <div class="checkbox-item" data-field="issues" data-value="収納不足">
-                                <input type="checkbox" id="issues_storage">
-                                <label for="issues_storage">収納が足りない</label>
-                            </div>
-                            <div class="checkbox-item" data-field="issues" data-value="日当たり悪い">
-                                <input type="checkbox" id="issues_sunlight">
-                                <label for="issues_sunlight">日当たりが悪い</label>
-                            </div>
-                            <div class="checkbox-item" data-field="issues" data-value="風通し悪い">
-                                <input type="checkbox" id="issues_ventilation">
-                                <label for="issues_ventilation">風通しが悪い</label>
-                            </div>
-                            <div class="checkbox-item" data-field="issues" data-value="寒い暑い">
-                                <input type="checkbox" id="issues_temperature">
-                                <label for="issues_temperature">寒い・暑い</label>
-                            </div>
-                            <div class="checkbox-item" data-field="issues" data-value="音の問題">
-                                <input type="checkbox" id="issues_noise">
-                                <label for="issues_noise">音の問題</label>
-                            </div>
-                            <div class="checkbox-item" data-field="issues" data-value="動線が悪い">
-                                <input type="checkbox" id="issues_flow">
-                                <label for="issues_flow">動線が悪い</label>
-                            </div>
-                            <div class="checkbox-item" data-field="issues" data-value="特になし">
-                                <input type="checkbox" id="issues_none">
-                                <label for="issues_none">特に不満はない</label>
-                            </div>
-                        </div>
-                    </div>
-                `
+                title: '現在の不満',
+                icon: 'M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
+                render: renderCurrentIssuesStep
             },
             {
-                title: "💼 ライフスタイル",
-                description: "普段の生活スタイルについて教えてください。",
-                content: `
-                    <div class="form-group">
-                        <h3>💼 働き方・生活スタイル</h3>
-                        <div class="checkbox-grid">
-                            <div class="checkbox-item" data-field="lifestyle" data-value="在宅勤務多い">
-                                <input type="checkbox" id="lifestyle_wfh">
-                                <label for="lifestyle_wfh">在宅勤務が多い</label>
-                            </div>
-                            <div class="checkbox-item" data-field="lifestyle" data-value="来客多い">
-                                <input type="checkbox" id="lifestyle_guests">
-                                <label for="lifestyle_guests">来客が多い</label>
-                            </div>
-                            <div class="checkbox-item" data-field="lifestyle" data-value="料理好き">
-                                <input type="checkbox" id="lifestyle_cooking">
-                                <label for="lifestyle_cooking">料理をよくする</label>
-                            </div>
-                            <div class="checkbox-item" data-field="lifestyle" data-value="読書好き">
-                                <input type="checkbox" id="lifestyle_reading">
-                                <label for="lifestyle_reading">読書・勉強スペースが欲しい</label>
-                            </div>
-                            <div class="checkbox-item" data-field="lifestyle" data-value="趣味スペース">
-                                <input type="checkbox" id="lifestyle_hobby">
-                                <label for="lifestyle_hobby">趣味のスペースが欲しい</label>
-                            </div>
-                            <div class="checkbox-item" data-field="lifestyle" data-value="シンプル">
-                                <input type="checkbox" id="lifestyle_simple">
-                                <label for="lifestyle_simple">シンプルな暮らし</label>
-                            </div>
-                        </div>
-                    </div>
-                `
+                title: 'ライフスタイル',
+                icon: 'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z',
+                render: renderLifestyleStep
             },
             {
-                title: "🏠 リフォーム箇所",
-                description: "リフォームをお考えの箇所を教えてください。",
-                content: `
-                    <div class="form-group">
-                        <h3>🏠 リフォーム希望箇所</h3>
-                        <div class="checkbox-grid">
-                            <div class="checkbox-item" data-field="areas" data-value="キッチン">
-                                <input type="checkbox" id="areas_kitchen">
-                                <label for="areas_kitchen">キッチン</label>
-                            </div>
-                            <div class="checkbox-item" data-field="areas" data-value="浴室・洗面所">
-                                <input type="checkbox" id="areas_bathroom">
-                                <label for="areas_bathroom">浴室・洗面所</label>
-                            </div>
-                            <div class="checkbox-item" data-field="areas" data-value="トイレ">
-                                <input type="checkbox" id="areas_toilet">
-                                <label for="areas_toilet">トイレ</label>
-                            </div>
-                            <div class="checkbox-item" data-field="areas" data-value="リビング・ダイニング">
-                                <input type="checkbox" id="areas_living">
-                                <label for="areas_living">リビング・ダイニング</label>
-                            </div>
-                            <div class="checkbox-item" data-field="areas" data-value="寝室">
-                                <input type="checkbox" id="areas_bedroom">
-                                <label for="areas_bedroom">寝室</label>
-                            </div>
-                            <div class="checkbox-item" data-field="areas" data-value="子供部屋">
-                                <input type="checkbox" id="areas_kids">
-                                <label for="areas_kids">子供部屋</label>
-                            </div>
-                            <div class="checkbox-item" data-field="areas" data-value="外壁・屋根">
-                                <input type="checkbox" id="areas_exterior">
-                                <label for="areas_exterior">外壁・屋根</label>
-                            </div>
-                            <div class="checkbox-item" data-field="areas" data-value="全体">
-                                <input type="checkbox" id="areas_whole">
-                                <label for="areas_whole">全体的なリノベーション</label>
-                            </div>
-                        </div>
-                    </div>
-                `
+                title: 'リフォーム箇所',
+                icon: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
+                render: renderReformAreasStep
             },
             {
-                title: "💰 予算・時期・その他",
-                description: "予算や時期、その他のご要望をお聞かせください。",
-                content: `
-                    <div class="form-group">
-                        <h3>💰 ご予算</h3>
-                        <div class="select-group">
-                            <label for="budget">予算の目安</label>
-                            <select id="budget" data-field="budget">
-                                <option value="">選択してください</option>
-                                <option value="100万円未満">100万円未満</option>
-                                <option value="100-300万円">100-300万円</option>
-                                <option value="300-500万円">300-500万円</option>
-                                <option value="500-1000万円">500-1000万円</option>
-                                <option value="1000万円以上">1000万円以上</option>
-                                <option value="未定">まだ決めていない</option>
-                            </select>
-                        </div>
-                        <div class="select-group">
-                            <label for="timing">希望時期</label>
-                            <select id="timing" data-field="timing">
-                                <option value="">選択してください</option>
-                                <option value="すぐにでも">すぐにでも</option>
-                                <option value="3ヶ月以内">3ヶ月以内</option>
-                                <option value="半年以内">半年以内</option>
-                                <option value="1年以内">1年以内</option>
-                                <option value="1年以上先">1年以上先</option>
-                                <option value="未定">まだ決めていない</option>
-                            </select>
-                        </div>
-                        <div class="textarea-group">
-                            <label for="other_requests">その他のご要望</label>
-                            <textarea id="other_requests" data-field="other_requests" placeholder="その他、ご要望やご質問があればお聞かせください..."></textarea>
-                        </div>
-                    </div>
-                `
+                title: '予算・時期',
+                icon: 'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z',
+                render: renderBudgetStep
             }
         ];
 
-        // 初期化
-        function init() {
-            updateStepContent();
-            updateProgress();
-            updateNavigation();
-        }
-
-        // ステップ内容更新
-        function updateStepContent() {
-            const stepContent = document.getElementById('step-content');
-            const step = steps[currentStep - 1];
-            
-            stepContent.innerHTML = `
+        // ステップ描画関数（厳選版）
+        function renderFamilyStep() {
+            return `
                 <div class="section-title">
-                    ${step.title}
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[0].icon}"/>
+                    </svg>
+                    家族構成を教えてください
                 </div>
-                <div class="section-description">
-                    ${step.description}
+                <p class="section-description">同居されている方についてお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>👨‍👩‍👧‍👦 同居家族</h3>
+                    <div class="checkbox-grid">
+                        ${['本人', '配偶者', '子供（小学生以下）', '子供（中学生以上）', '両親・祖父母', 'その他'].map(member => `
+                            <div class="checkbox-item ${formData.familyMembers.includes(member) ? 'checked' : ''}" data-field="familyMembers" data-value="${member}">
+                                <input type="checkbox" ${formData.familyMembers.includes(member) ? 'checked' : ''}>
+                                <label>${member}</label>
+                            </div>
+                        `).join('')}
+                    </div>
                 </div>
-                ${step.content}
+
+                <div class="form-group">
+                    <h3>🎂 年齢層</h3>
+                    <div class="select-group">
+                        <label for="mainAge">主たる使用者の年齢層</label>
+                        <select id="mainAge" onchange="updateFormData('familyAges', {main: this.value})">
+                            <option value="">年齢層を選択してください</option>
+                            <option value="20代" ${formData.familyAges.main === '20代' ? 'selected' : ''}>20代</option>
+                            <option value="30代" ${formData.familyAges.main === '30代' ? 'selected' : ''}>30代</option>
+                            <option value="40代" ${formData.familyAges.main === '40代' ? 'selected' : ''}>40代</option>
+                            <option value="50代" ${formData.familyAges.main === '50代' ? 'selected' : ''}>50代</option>
+                            <option value="60代以上" ${formData.familyAges.main === '60代以上' ? 'selected' : ''}>60代以上</option>
+                        </select>
+                    </div>
+                </div>
             `;
-
-            // チェックボックスのイベントリスナーを設定
-            setupCheckboxListeners();
-            
-            // セレクトボックスのイベントリスナーを設定
-            setupSelectListeners();
-            
-            // テキストエリアのイベントリスナーを設定
-            setupTextareaListeners();
-
-            // 保存されたデータを復元
-            restoreFormData();
         }
 
-        // チェックボックスのイベントリスナー設定
+        function renderBuildingStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
+                        <path d="${steps[1].icon}"/>
+                    </svg>
+                    住所・建物情報
+                </div>
+                <p class="section-description">お住まいの地域と建物についてお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>📍 お住まいの地域</h3>
+                    <div class="select-group">
+                        <label for="currentAddress">現在の住所</label>
+                        <select id="currentAddress" onchange="updateFormData('currentAddress', this.value)">
+                            <option value="">市区町村を選択してください</option>
+                            ${['熊本市中央区', '熊本市東区', '熊本市西区', '熊本市南区', '熊本市北区', '八代市', '人吉市', '荒尾市', '水俣市', '玉名市', '山鹿市', '菊池市', '宇土市', '上天草市', '宇城市', '阿蘇市', '天草市', '合志市', 'その他熊本県内', '熊本県外'].map(city => `
+                                <option value="${city}" ${formData.currentAddress === city ? 'selected' : ''}>${city}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>🏠 建物情報</h3>
+                    <div class="select-group">
+                        <label for="buildingType">建物種別</label>
+                        <select id="buildingType" onchange="updateFormData('buildingType', this.value)">
+                            <option value="">建物種別を選択してください</option>
+                            ${['戸建て住宅', '分譲マンション', '賃貸マンション', 'アパート', 'その他'].map(type => `
+                                <option value="${type}" ${formData.buildingType === type ? 'selected' : ''}>${type}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="select-group">
+                        <label for="buildingAge">築年数</label>
+                        <select id="buildingAge" onchange="updateFormData('buildingAge', this.value)">
+                            <option value="">築年数を選択してください</option>
+                            ${['新築', '1-10年', '11-20年', '21-30年', '31年以上', '不明'].map(age => `
+                                <option value="${age}" ${formData.buildingAge === age ? 'selected' : ''}>${age}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPetStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[2].icon}"/>
+                    </svg>
+                    ペットについて
+                </div>
+                <p class="section-description">ペットに配慮した設計のご提案をいたします</p>
+                
+                <div class="form-group">
+                    <h3>🐕 ペットの種類</h3>
+                    <div class="checkbox-grid">
+                        ${['犬（小型）', '犬（中・大型）', '猫', 'その他', 'いません'].map(pet => `
+                            <div class="checkbox-item ${formData.pets[pet] ? 'checked' : ''}" data-field="pets" data-value="${pet}">
+                                <input type="checkbox" ${formData.pets[pet] ? 'checked' : ''}>
+                                <label>${pet}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCurrentIssuesStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
+                        <path d="${steps[3].icon}"/>
+                    </svg>
+                    現在の不満・改善したい点
+                </div>
+                <p class="section-description">現在お困りのことがあればお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>😟 改善したい点</h3>
+                    <div class="checkbox-grid">
+                        ${['収納が少ない', '部屋が狭い', '日当たりが悪い', '寒い・暑い', '古くなった', '使い勝手が悪い', '特になし'].map(issue => `
+                            <div class="checkbox-item ${formData.currentIssues.includes(issue) ? 'checked' : ''}" data-field="currentIssues" data-value="${issue}">
+                                <input type="checkbox" ${formData.currentIssues.includes(issue) ? 'checked' : ''}>
+                                <label>${issue}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderLifestyleStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[4].icon}"/>
+                    </svg>
+                    ライフスタイル
+                </div>
+                <p class="section-description">普段の生活スタイルについてお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>🏡 生活スタイル</h3>
+                    <div class="checkbox-grid">
+                        ${['料理をよくする', '在宅勤務が多い', '友人をよく招く', '収納・整理整頓を重視', '掃除しやすさを重視', 'バリアフリーを重視'].map(style => `
+                            <div class="checkbox-item ${formData.lifestyle.includes(style) ? 'checked' : ''}" data-field="lifestyle" data-value="${style}">
+                                <input type="checkbox" ${formData.lifestyle.includes(style) ? 'checked' : ''}>
+                                <label>${style}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReformAreasStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #ef4444;">
+                        <path d="${steps[5].icon}"/>
+                    </svg>
+                    リフォームしたい箇所
+                </div>
+                <p class="section-description">リフォームをご希望の箇所をお選びください</p>
+                
+                <div class="form-group">
+                    <h3>🔧 リフォーム箇所</h3>
+                    <div class="checkbox-grid">
+                        ${['キッチン', '浴室・お風呂', '洗面所・トイレ', 'リビング・ダイニング', '和室・洋室', '玄関', '外壁・屋根', '全体・間取り変更'].map(area => `
+                            <div class="checkbox-item ${formData.reformAreas.includes(area) ? 'checked' : ''}" data-field="reformAreas" data-value="${area}">
+                                <input type="checkbox" ${formData.reformAreas.includes(area) ? 'checked' : ''}>
+                                <label>${area}</label>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderBudgetStep() {
+            return `
+                <div class="section-title">
+                    <svg class="icon" viewBox="0 0 24 24" style="fill: #3b82f6;">
+                        <path d="${steps[6].icon}"/>
+                    </svg>
+                    予算・時期
+                </div>
+                <p class="section-description">リフォームの予算と時期についてお聞かせください</p>
+                
+                <div class="form-group">
+                    <h3>💰 予算・時期</h3>
+                    <div class="select-group">
+                        <label for="budget">予算（概算）</label>
+                        <select id="budget" onchange="updateFormData('budget', this.value)">
+                            <option value="">予算を選択してください</option>
+                            ${['100万円未満', '100-300万円', '300-500万円', '500-1000万円', '1000万円以上', '未定・相談したい'].map(budget => `
+                                <option value="${budget}" ${formData.budget === budget ? 'selected' : ''}>${budget}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                    
+                    <div class="select-group">
+                        <label for="timeline">希望時期</label>
+                        <select id="timeline" onchange="updateFormData('timeline', this.value)">
+                            <option value="">希望時期を選択してください</option>
+                            ${['すぐに（3ヶ月以内）', '半年以内', '1年以内', '1年以上先', '未定・相談したい'].map(time => `
+                                <option value="${time}" ${formData.timeline === time ? 'selected' : ''}>${time}</option>
+                            `).join('')}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <h3>💭 その他のご要望</h3>
+                    <div class="textarea-group">
+                        <label for="otherRequests">その他のご要望・ご質問</label>
+                        <textarea id="otherRequests" placeholder="その他のご要望やご質問があればお聞かせください" onchange="updateFormData('otherRequests', this.value)">${formData.otherRequests}</textarea>
+                    </div>
+                </div>
+            `;
+        }
+
+        // イベントリスナーを設定する関数
         function setupCheckboxListeners() {
             const checkboxItems = document.querySelectorAll('.checkbox-item');
             checkboxItems.forEach(item => {
-                item.addEventListener('click', function() {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const field = this.getAttribute('data-field');
+                    const value = this.getAttribute('data-value');
                     const checkbox = this.querySelector('input[type="checkbox"]');
-                    const field = this.dataset.field;
-                    const value = this.dataset.value;
                     
-                    // 同じフィールドの他のチェックボックスをクリア（単一選択）
-                    const sameFieldItems = document.querySelectorAll(`[data-field="${field}"]`);
-                    sameFieldItems.forEach(otherItem => {
-                        if (otherItem !== this) {
-                            otherItem.classList.remove('checked');
-                            otherItem.querySelector('input[type="checkbox"]').checked = false;
+                    // チェック状態を切り替え
+                    checkbox.checked = !checkbox.checked;
+                    
+                    if (field === 'pets') {
+                        // ペットの場合
+                        formData.pets[value] = checkbox.checked;
+                    } else {
+                        // その他の配列フィールドの場合
+                        if (checkbox.checked) {
+                            if (!formData[field].includes(value)) {
+                                formData[field].push(value);
+                            }
+                            this.classList.add('checked');
+                        } else {
+                            formData[field] = formData[field].filter(item => item !== value);
+                            this.classList.remove('checked');
                         }
-                    });
+                    }
                     
-                    // 現在のアイテムをトグル
-                    const isChecked = !checkbox.checked;
-                    checkbox.checked = isChecked;
-                    
-                    if (isChecked) {
+                    // 見た目を更新
+                    if (checkbox.checked) {
                         this.classList.add('checked');
-                        hearingData[field] = value;
                     } else {
                         this.classList.remove('checked');
-                        delete hearingData[field];
                     }
                 });
             });
         }
 
-        // セレクトボックスのイベントリスナー設定
-        function setupSelectListeners() {
-            const selects = document.querySelectorAll('select[data-field]');
-            selects.forEach(select => {
-                select.addEventListener('change', function() {
-                    const field = this.dataset.field;
-                    const value = this.value;
-                    
-                    if (value) {
-                        hearingData[field] = value;
-                    } else {
-                        delete hearingData[field];
-                    }
-                });
-            });
-        }
-
-        // テキストエリアのイベントリスナー設定
-        function setupTextareaListeners() {
-            const textareas = document.querySelectorAll('textarea[data-field]');
-            textareas.forEach(textarea => {
-                textarea.addEventListener('input', function() {
-                    const field = this.dataset.field;
-                    const value = this.value.trim();
-                    
-                    if (value) {
-                        hearingData[field] = value;
-                    } else {
-                        delete hearingData[field];
-                    }
-                });
-            });
-        }
-
-        // フォームデータ復元
-        function restoreFormData() {
-            // チェックボックス復元
-            Object.keys(hearingData).forEach(field => {
-                const value = hearingData[field];
-                const item = document.querySelector(`[data-field="${field}"][data-value="${value}"]`);
-                if (item) {
-                    item.classList.add('checked');
-                    item.querySelector('input[type="checkbox"]').checked = true;
-                }
-            });
-
-            // セレクトボックス復元
-            const selects = document.querySelectorAll('select[data-field]');
-            selects.forEach(select => {
-                const field = select.dataset.field;
-                if (hearingData[field]) {
-                    select.value = hearingData[field];
-                }
-            });
-
-            // テキストエリア復元
-            const textareas = document.querySelectorAll('textarea[data-field]');
-            textareas.forEach(textarea => {
-                const field = textarea.dataset.field;
-                if (hearingData[field]) {
-                    textarea.value = hearingData[field];
-                }
-            });
-        }
-
-        // プログレス更新
-        function updateProgress() {
-            const progress = (currentStep / totalSteps) * 100;
-            const progressFill = document.getElementById('progress-fill');
-            const progressText = document.getElementById('progress-text');
-            const stepName = document.getElementById('step-name');
-            
-            progressFill.style.width = progress + '%';
-            progressText.textContent = Math.round(progress) + '%';
-            stepName.textContent = `ステップ ${currentStep} / ${totalSteps}`;
-        }
-
-        // ナビゲーション更新
-        function updateNavigation() {
-            const prevBtn = document.getElementById('prev-btn');
-            const nextBtn = document.getElementById('next-btn');
-            
-            prevBtn.disabled = currentStep === 1;
-            
-            if (currentStep === totalSteps) {
-                nextBtn.textContent = 'チャット開始 💬';
+        function updateFormData(field, value) {
+            if (field === 'familyAges') {
+                formData.familyAges = { ...formData.familyAges, ...value };
             } else {
-                nextBtn.textContent = '次へ →';
+                formData[field] = value;
             }
         }
 
-        // 次のステップ
+        // ナビゲーション関数
         function nextStep() {
-            if (currentStep < totalSteps) {
+            if (currentStep < steps.length - 1) {
                 currentStep++;
-                updateStepContent();
+                renderCurrentStep();
                 updateProgress();
                 updateNavigation();
             } else {
-                // ヒアリング完了、チャット画面へ
                 startChat();
             }
         }
 
-        // 前のステップ
-        function previousStep() {
-            if (currentStep > 1) {
+        function prevStep() {
+            if (currentStep > 0) {
                 currentStep--;
-                updateStepContent();
+                renderCurrentStep();
                 updateProgress();
                 updateNavigation();
             }
         }
 
-        // チャット開始
+        function renderCurrentStep() {
+            const stepContent = document.getElementById('step-content');
+            stepContent.innerHTML = steps[currentStep].render();
+            
+            // チェックボックスのイベントリスナーを設定
+            setupCheckboxListeners();
+            
+            // ステップアイコンとタイトルを更新
+            const stepIcon = document.getElementById('step-icon');
+            const stepName = document.getElementById('step-name');
+            stepIcon.innerHTML = `<path d="${steps[currentStep].icon}"/>`;
+            stepName.textContent = steps[currentStep].title;
+        }
+
+        function updateProgress() {
+            const progress = ((currentStep + 1) / steps.length) * 100;
+            const progressFill = document.getElementById('progress-fill');
+            const stepText = document.getElementById('step-text');
+            const progressPercent = document.getElementById('progress-percent');
+            
+            progressFill.style.width = `${progress}%`;
+            stepText.textContent = `ステップ ${currentStep + 1} / ${steps.length}`;
+            progressPercent.textContent = `${Math.round(progress)}%`;
+        }
+
+        function updateNavigation() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            prevBtn.disabled = currentStep === 0;
+            
+            if (currentStep === steps.length - 1) {
+                nextBtn.innerHTML = `
+                    チャット開始
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                `;
+            } else {
+                nextBtn.innerHTML = `
+                    次へ
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M5 12h14m-7-7l7 7-7 7"/>
+                    </svg>
+                `;
+            }
+        }
+
+        // チャット機能
         function startChat() {
             document.getElementById('hearing-screen').classList.add('hidden');
             document.getElementById('chat-screen').classList.remove('hidden');
             
-            // 初回メッセージを送信
-            sendInitialMessage();
+            // 初期メッセージを表示
+            const initialMessage = generateInitialMessage();
+            addMessage('assistant', initialMessage);
             
-            // ホバーボタンの表示設定
-            setupContactButton();
+            // ホバーボタンを表示
+            setTimeout(() => {
+                const contactButton = document.getElementById('contact-button');
+                contactButton.classList.add('show');
+            }, 1000);
         }
 
-        // 初回メッセージ送信
-        async function sendInitialMessage() {
-            const chatMessages = document.getElementById('chat-messages');
+        function generateInitialMessage() {
+            const familyInfo = formData.familyMembers.length > 0 ? formData.familyMembers.join('、') : '情報なし';
+            const reformAreas = formData.reformAreas.length > 0 ? formData.reformAreas.join('、') : '未選択';
+            const budget = formData.budget || '未定';
             
-            // ローディング表示
-            showLoadingMessage();
-            
-            try {
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        message: 'ヒアリング完了',
-                        hearing_data: hearingData,
-                        is_initial: true
-                    })
-                });
-                
-                const data = await response.json();
-                
-                // ローディング削除
-                removeLoadingMessage();
-                
-                // アシスタントのメッセージを表示
-                addMessage('assistant', data.response);
-                
-            } catch (error) {
-                console.error('Error:', error);
-                removeLoadingMessage();
-                addMessage('assistant', 'エラーが発生しました。もう一度お試しください。');
-            }
+            return `こんにちは！😊
+ヒアリングありがとうございました。
+
+${familyInfo}でお住まいで、${reformAreas}のリフォームをご検討なんですね。
+
+ご予算${budget}で、素敵なプランをいくつか思い浮かびました！
+
+特におすすめしたいのは以下の3つです：
+
+1. 機能性を重視した実用的なリフォーム
+2. デザイン性を活かした美しいリフォーム  
+3. 家族の成長に配慮した将来対応リフォーム
+
+どちらに一番興味がおありでしょうか？🏠`;
         }
 
-        // メッセージ送信
         async function sendMessage() {
             const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
             const message = chatInput.value.trim();
             
             if (!message) return;
             
-            // ユーザーメッセージを表示
+            // ユーザーメッセージを追加
             addMessage('user', message);
             chatInput.value = '';
             
-            // チャット回数をカウント
-            chatCount++;
+            // 送信ボタンを無効化
+            sendBtn.disabled = true;
             
             // ローディング表示
             showLoadingMessage();
+            
+            // チャット回数をカウント
+            chatCount++;
             
             try {
                 const response = await fetch('/chat', {
@@ -1610,53 +1535,58 @@
                     },
                     body: JSON.stringify({
                         message: message,
-                        hearing_data: hearingData,
-                        chat_count: chatCount
+                        formData: formData,
+                        chatHistory: getChatHistory(),
+                        chatCount: chatCount
                     })
                 });
                 
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
                 const data = await response.json();
                 
-                // ローディング削除
+                // ローディングを削除
                 removeLoadingMessage();
                 
-                // アシスタントのメッセージを表示
+                // アシスタントの返答を追加
                 addMessage('assistant', data.response);
                 
             } catch (error) {
                 console.error('Error:', error);
                 removeLoadingMessage();
-                addMessage('assistant', 'エラーが発生しました。もう一度お試しください。');
+                addMessage('assistant', 'エラーが発生しました。再度お試しください。');
+            } finally {
+                // 送信ボタンを有効化
+                sendBtn.disabled = false;
             }
         }
 
-        // メッセージ追加
-        function addMessage(sender, content) {
+        function addMessage(role, content) {
             const chatMessages = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender}`;
+            messageDiv.className = `message ${role}`;
             
-            const avatar = sender === 'user' ? '👤' : '🏠';
+            const avatarSvg = role === 'assistant' ? 
+                '<svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' :
+                '<svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>';
             
-            // URLを自動的にリンクに変換
-            const linkedContent = linkifyContent(content);
+            // URLをリンクに変換する関数
+            const linkifyContent = (text) => {
+                const urlRegex = /(https?:\/\/[^\s]+)/g;
+                return text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
+            };
             
             messageDiv.innerHTML = `
-                <div class="message-avatar">${avatar}</div>
-                <div class="message-content">${linkedContent}</div>
+                <div class="message-avatar">${avatarSvg}</div>
+                <div class="message-content">${linkifyContent(content)}</div>
             `;
             
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // URLをリンクに変換
-        function linkifyContent(text) {
-            const urlRegex = /(https?:\/\/[^\s]+)/g;
-            return text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
-        }
-
-        // ローディングメッセージ表示
         function showLoadingMessage() {
             const chatMessages = document.getElementById('chat-messages');
             const loadingDiv = document.createElement('div');
@@ -1664,10 +1594,12 @@
             loadingDiv.id = 'loading-message';
             
             loadingDiv.innerHTML = `
-                <div class="message-avatar">🏠</div>
+                <div class="message-avatar">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </div>
                 <div class="loading-message">
                     <div class="loading-spinner"></div>
-                    <span>考え中...</span>
+                    <span>回答を生成中...</span>
                 </div>
             `;
             
@@ -1675,7 +1607,6 @@
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // ローディングメッセージ削除
         function removeLoadingMessage() {
             const loadingMessage = document.getElementById('loading-message');
             if (loadingMessage) {
@@ -1683,34 +1614,36 @@
             }
         }
 
-        // キー押下処理
-        function handleKeyPress(event) {
+        function getChatHistory() {
+            const messages = [];
+            const messageElements = document.querySelectorAll('.message:not(#loading-message)');
+            
+            messageElements.forEach(element => {
+                const role = element.classList.contains('user') ? 'user' : 'assistant';
+                const content = element.querySelector('.message-content').textContent;
+                messages.push({ role, content });
+            });
+            
+            return messages;
+        }
+
+        function handleChatKeyPress(event) {
             if (event.key === 'Enter') {
                 sendMessage();
             }
         }
 
-        // 問い合わせボタンの設定
-        function setupContactButton() {
-            const chatMessages = document.getElementById('chat-messages');
-            const contactButton = document.getElementById('contact-button');
-            
-            let hoverTimer;
-            
-            chatMessages.addEventListener('mouseenter', function() {
-                hoverTimer = setTimeout(() => {
-                    contactButton.classList.add('show');
-                }, 500);
-            });
-            
-            chatMessages.addEventListener('mouseleave', function() {
-                clearTimeout(hoverTimer);
-                contactButton.classList.remove('show');
-            });
+        function backToHearing() {
+            document.getElementById('chat-screen').classList.add('hidden');
+            document.getElementById('hearing-screen').classList.remove('hidden');
         }
 
-        // 初期化実行
-        init();
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCurrentStep();
+            updateProgress();
+            updateNavigation();
+        });
     </script>
 </body>
 </html>
