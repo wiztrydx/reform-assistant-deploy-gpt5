@@ -116,7 +116,7 @@ def initial_message():
         }), 500
 
 @app.route('/api/chat', methods=['POST'])
-def chat():
+def api_chat():
     try:
         data = request.get_json()
         messages = data.get('messages', [])
@@ -181,13 +181,96 @@ https://re-homekumamoto.com/contact/」
         })
         
     except Exception as e:
-        print(f"Error in chat: {str(e)}")
+        print(f"Error in api_chat: {str(e)}")
         return jsonify({
             'error': 'エラーが発生しました',
             'response': '申し訳ございません。😅\n一時的にエラーが発生しました。\n\nしばらくしてから再度お試しいただくか、\n以下からお選びください：\n\n1. もう一度質問する\n2. 別の話題に変える\n3. 直接お電話で相談する\n\nどちらがよろしいでしょうか？🏠'
         }), 500
 
+# フロントエンド用の /chat エンドポイントを追加
+@app.route('/chat', methods=['POST'])
+def chat():
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '')
+        form_data = data.get('formData', {})
+        chat_history = data.get('chatHistory', [])
+        chat_count = data.get('chatCount', 0)
+        
+        # フォームデータを整理
+        family_info = "、".join(form_data.get('familyMembers', [])) if form_data.get('familyMembers') else "情報なし"
+        building_info = f"{form_data.get('buildingType', '未選択')}（築{form_data.get('buildingAge', '不明')}）"
+        reform_areas = "、".join(form_data.get('reformAreas', [])) if form_data.get('reformAreas') else "未選択"
+        budget = form_data.get('budget', '未定')
+        timeline = form_data.get('timeline', '未定')
+        current_issues = "、".join(form_data.get('currentIssues', [])) if form_data.get('currentIssues') else "特になし"
+        lifestyle = "、".join(form_data.get('lifestyle', [])) if form_data.get('lifestyle') else "情報なし"
+        
+        # システムプロンプト
+        system_prompt = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の専門アドバイザーです。
+
+お客様情報：
+- 家族構成: {family_info}
+- 建物情報: {building_info}
+- 住所: {form_data.get('currentAddress', '未選択')}
+- リフォーム希望箇所: {reform_areas}
+- 予算: {budget}
+- 希望時期: {timeline}
+- 現在の不満: {current_issues}
+- ライフスタイル: {lifestyle}
+- その他要望: {form_data.get('otherRequests', 'なし')}
+
+回答ルール：
+1. 300字以内で回答
+2. マークダウン記号（**、##、-、*など）は使用禁止
+3. 絵文字を1-3個使用
+4. 改行を使って読みやすく
+5. 親しみやすい自然な会話調
+6. 具体的な提案は3つの選択肢で番号付き
+7. 熊本の気候や住環境を考慮した専門的アドバイス
+
+現在のチャット回数: {chat_count}回目"""
+
+        # 4往復目以降の場合、URL案内を含める
+        if chat_count >= 4:
+            system_prompt += "\n\n重要: この回答で自然にhttps://re-homekumamoto.com/contact/への問い合わせを案内してください。"
+        
+        # チャット履歴を構築
+        messages = [{"role": "system", "content": system_prompt}]
+        
+        # 過去のチャット履歴を追加
+        for msg in chat_history[-10:]:  # 最新10件のみ
+            messages.append({"role": msg['role'], "content": msg['content']})
+        
+        # 現在のユーザーメッセージを追加
+        messages.append({"role": "user", "content": user_message})
+        
+        # OpenAI APIを呼び出し
+        response = openai.ChatCompletion.create(
+            model="gpt-4o",
+            messages=messages,
+            max_tokens=500,
+            temperature=0.7
+        )
+        
+        assistant_response = response.choices[0].message.content.strip()
+        
+        return jsonify({
+            'response': assistant_response,
+            'status': 'success'
+        })
+        
+    except Exception as e:
+        print(f"Error in chat endpoint: {str(e)}")
+        return jsonify({
+            'response': '申し訳ございません。一時的にエラーが発生しました。😅\n\nしばらく時間をおいてから再度お試しください。\n\nお急ぎの場合は、直接お問い合わせフォームからご連絡ください。',
+            'status': 'error'
+        }), 500
+
+@app.route('/health')
+def health():
+    return jsonify({'status': 'healthy', 'model': 'gpt-4o'})
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port, debug=False)
-
