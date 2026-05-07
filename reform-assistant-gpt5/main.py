@@ -182,14 +182,22 @@ def _build_chat_prompt(customer_context: str, chat_count: int) -> str:
 
 
 def _call_openai(messages: list[dict], max_tokens: int) -> str:
-    response = client.chat.completions.create(
-        model=MODEL_NAME,
-        messages=messages,
-        max_tokens=max_tokens,
-        temperature=TEMPERATURE,
-        presence_penalty=PRESENCE_PENALTY,
-        frequency_penalty=FREQUENCY_PENALTY,
-    )
+    # GPT-5 系の新モデルは max_tokens を廃止し max_completion_tokens を要求する。
+    # 旧モデル(gpt-4o 等)は max_completion_tokens でも受理されるので、これを既定で送る。
+    kwargs: dict = {
+        "model": MODEL_NAME,
+        "messages": messages,
+        "max_completion_tokens": max_tokens,
+    }
+    # GPT-5 系は temperature/penalty 系のチューニングパラメータを受け付けないことがあるため、
+    # gpt-5 を含むモデル名では送らない。
+    is_gpt5 = "gpt-5" in MODEL_NAME.lower()
+    if not is_gpt5:
+        kwargs["temperature"] = TEMPERATURE
+        kwargs["presence_penalty"] = PRESENCE_PENALTY
+        kwargs["frequency_penalty"] = FREQUENCY_PENALTY
+
+    response = client.chat.completions.create(**kwargs)
     content = response.choices[0].message.content or ""
     cleaned = remove_markdown(content.strip())
     return normalize_numbered_list(cleaned)
