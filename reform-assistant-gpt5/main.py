@@ -1,77 +1,128 @@
-from flask import Flask, request, jsonify, send_from_directory
-import openai
+"""リフォーム熊本 - リフォーム提案アシスタント (GPT-5.4 mini 版)."""
+
+from __future__ import annotations
+
+import logging
 import os
-import json
 import re
+import sys
+from typing import Any
 
-app = Flask(__name__, static_folder='static')
+from flask import Flask, jsonify, request, send_from_directory
+from flask_cors import CORS
+from openai import APIError, OpenAI, RateLimitError
 
-# OpenAI APIキーの設定
-openai.api_key = os.getenv('OPENAI_API_KEY')
-openai.api_base = os.getenv('OPENAI_API_BASE', 'https://api.openai.com/v1')
+# --- 設定値 ---
+MODEL_NAME = os.getenv("OPENAI_MODEL", "gpt-5.4-mini")
+INITIAL_MAX_TOKENS = 400
+CHAT_MAX_TOKENS = 500
+TEMPERATURE = 0.8
+PRESENCE_PENALTY = 0.3
+FREQUENCY_PENALTY = 0.3
+HISTORY_TURNS = 8  # 直近 8 往復 (=16 メッセージ) を保持
+CONTACT_URL = "https://re-homekumamoto.com/contact/"
 
-# --- 静的ファイルの配信 ---
-@app.route('/')
-def index():
-    return send_from_directory(app.static_folder, 'index.html')
+# --- ロギング ---
+logging.basicConfig(
+    level=os.getenv("LOG_LEVEL", "INFO"),
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+)
+logger = logging.getLogger("reform-assistant")
 
-# --- ヘルパー関数 ---
-def remove_markdown(text):
-    """マークダウン記号を確実に除去する関数"""
-    # 太字、イタリック、コードブロック等を除去
-    text = re.sub(r'\*\*([^*]+)\*\*', r'\1', text)  # **太字**
-    text = re.sub(r'\*([^*]+)\*', r'\1', text)      # *イタリック*
-    text = re.sub(r'__([^_]+)__', r'\1', text)      # __太字__
-    text = re.sub(r'_([^_]+)_', r'\1', text)        # _イタリック_
+# --- OpenAI クライアント ---
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    logger.error("OPENAI_API_KEY が設定されていません。起動を中止します。")
+    sys.exit(1)
 
-    
+client = OpenAI(
+    api_key=api_key,
+    base_url=os.getenv("OPENAI_API_BASE"),  # None なら公式エンドポイント
+)
+
+# --- Flask ---
+app = Flask(__name__, static_folder="static")
+CORS(app)
+
+
+# --- 静的ファイル ---
+@app.route("/")
+def index() -> Any:
+    return send_from_directory(app.static_folder, "index.html")
+
+
+@app.route("/static/<path:filename>")
+def static_files(filename: str) -> Any:
+    return send_from_directory(app.static_folder, filename)
+
+
+# --- ヘルパー ---
+_MARKDOWN_PATTERNS = [
+    (re.compile(r"\*\*([^*]+)\*\*"), r"\1"),
+    (re.compile(r"\*([^*]+)\*"), r"\1"),
+    (re.compile(r"__([^_]+)__"), r"\1"),
+    (re.compile(r"_([^_]+)_"), r"\1"),
+    (re.compile(r"`([^`]+)`"), r"\1"),
+]
+_NUMBER_LIST_NORMALIZER = re.compile(r"(\d+)\s*[.．。]\s*")
+
+
+def remove_markdown(text: str) -> str:
+    for pattern, repl in _MARKDOWN_PATTERNS:
+        text = pattern.sub(repl, text)
     return text.strip()
 
-def format_customer_info(form_data):
-    """顧客情報を簡潔な文字列に整形"""
-    info_parts = []
-    
-    if form_data.get('familyMembers'):
-        info_parts.append(f"家族構成: {', '.join(form_data['familyMembers'])}")
-    
-    if form_data.get('currentAddress'):
-        building_info = f"{form_data['currentAddress']}の{form_data.get('buildingType', '住宅')}"
-        if form_data.get('buildingAge'):
-            building_info += f"（築{form_data['buildingAge']}）"
-        info_parts.append(f"お住まい: {building_info}")
-    
-    pets_info = [pet for pet, has_pet in form_data.get('pets', {}).items() if has_pet]
-    if pets_info:
-        info_parts.append(f"ペット: {', '.join(pets_info)}")
-    
-    if form_data.get('reformAreas'):
-        info_parts.append(f"リフォーム希望: {', '.join(form_data['reformAreas'])}")
-    
-    if form_data.get('budget'):
-        info_parts.append(f"予算: {form_data['budget']}")
-    
-    return " / ".join(info_parts)
 
-def generate_initial_message(form_data):
-    """初回メッセージ生成"""
+def normalize_numbered_list(text: str) -> str:
+    return _NUMBER_LIST_NORMALIZER.sub(r"\1. ", text)
+
+
+def format_customer_info(form_data: dict) -> str:
+    parts: list[str] = []
+
+    if form_data.get("familyMembers"):
+        parts.append(f"家族構成: {', '.join(form_data['familyMembers'])}")
+
+    if form_data.get("currentAddress"):
+        building = f"{form_data['currentAddress']}の{form_data.get('buildingType', '住宅')}"
+        if form_data.get("buildingAge"):
+            building += f"（築{form_data['buildingAge']}）"
+        parts.append(f"お住まい: {building}")
+
+    pets = [pet for pet, has in form_data.get("pets", {}).items() if has]
+    if pets:
+        parts.append(f"ペット: {', '.join(pets)}")
+
+    if form_data.get("reformAreas"):
+        parts.append(f"リフォーム希望: {', '.join(form_data['reformAreas'])}")
+
+    if form_data.get("budget"):
+        parts.append(f"予算: {form_data['budget']}")
+
+    if form_data.get("timeline"):
+        parts.append(f"希望時期: {form_data['timeline']}")
+
+    if form_data.get("otherRequests"):
+        parts.append(f"その他要望: {form_data['otherRequests']}")
+
+    return " / ".join(parts)
+
+
+def _build_initial_prompt(form_data: dict) -> str:
     customer_summary = format_customer_info(form_data)
-    
-    # 具体的な要望を抽出
-    main_concerns = []
-    if form_data.get('currentIssues'):
-        main_concerns.extend(form_data['currentIssues'])
-    if form_data.get('lifestyle'):
-        main_concerns.extend(form_data['lifestyle'])
-    
-    prompt = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすいアドバイザーです。
+    main_concerns: list[str] = []
+    main_concerns.extend(form_data.get("currentIssues") or [])
+    main_concerns.extend(form_data.get("lifestyle") or [])
+    concern_text = ", ".join(main_concerns[:3]) if main_concerns else "快適な住まい"
+
+    return f"""あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすいアドバイザーです。
 
 お客様情報: {customer_summary}
-主な関心事: {', '.join(main_concerns[:3]) if main_concerns else '快適な住まい'}
+主な関心事: {concern_text}
 
 リホーム熊本の情報(聞かれたら答える)
 所在地： 〒861-8038 熊本県熊本市東区長嶺東５丁目８−１０
 電話番号： 0120-182-471
-
 
 以下のルールで初回メッセージを作成:
 1. 絶対にマークダウン記号（*、#、-、`など）を使わない
@@ -88,43 +139,15 @@ def generate_initial_message(form_data):
 まずはどちらから詳しくお聞きしましょうか？
 
 1. 〇〇について
-2. △△について  
+2. △△について
 3. □□について」
 """
 
-    response = openai.ChatCompletion.create(
-        model="gpt-4o",
-        messages=[
-            {"role": "system", "content": prompt},
-            {"role": "user", "content": "お客様への初回メッセージをお願いします。"}
-        ],
-        max_tokens=400,
-        temperature=0.8
-    )
-    
-    return remove_markdown(response.choices[0].message.content.strip())
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    try:
-        data = request.get_json()
-        user_message = data.get('message', '')
-        form_data = data.get('formData', {})
-        chat_history = data.get('chatHistory', [])
-        chat_count = data.get('chatCount', 0)
+def _build_chat_prompt(customer_context: str, chat_count: int) -> str:
+    base = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすい専門アドバイザーです。
 
-        # 初回メッセージ
-        if chat_count == 0:
-            assistant_response = generate_initial_message(form_data)
-            return jsonify({'response': assistant_response})
-
-        # 2回目以降のチャット
-        customer_context = format_customer_info(form_data)
-        
-        # より具体的で親しみやすいシステムプロンプト
-        system_prompt = f"""あなたは熊本県のリフォーム会社「リホーム熊本」の親しみやすい専門アドバイザーです。
-
-【リホーム熊本の情報】(お客様から質問があった場合にのみ、以下の情報を案内してください)
+【リホーム熊本の情報】(お客様から質問があった場合にのみ案内する)
 所在地： 〒861-8038 熊本県熊本市東区長嶺東５丁目８−１０
 電話番号： 0120-182-471
 
@@ -132,7 +155,7 @@ def chat():
 {customer_context}
 
 【重要な応答ルール】
-1. マークダウン記号（*、**、#、-、`、_、[]()など）は絶対に使用禁止
+1. マークダウン記号（*、**、#、-、`、_、[]() など）は絶対に使用禁止
 2. 強調したい部分は「」で囲む
 3. 350字以内で簡潔に回答
 4. 絵文字を1-3個自然に使用（😊 💡 🏠 ✨ 👍 など）
@@ -142,72 +165,114 @@ def chat():
 【会話の進め方】
 - お客様の回答に共感を示してから提案する
 - 専門用語は使わず、分かりやすい言葉で説明
-- 常に3つの選択肢を数字で提示（1. 2. 3.の形式のみ）
+- 常に3つの選択肢を数字で提示（1. 2. 3. の形式のみ）
 - 選択肢は具体的で選びやすいものにする
 
 【例文の口調】
 「なるほど、〇〇が気になるんですね！熊本の夏は特に暑いので、その点も考慮した提案をさせていただきますね😊」"""
 
-        # 4往復目以降は問い合わせを促す
-        if chat_count >= 4:
-            system_prompt += """
+    if chat_count >= 4:
+        base += f"""
 
 【追加】会話の最後に自然に以下を追加:
 「詳しいご相談やお見積もりは、お気軽にこちらからどうぞ！
-https://re-homekumamoto.com/contact/」"""
+{CONTACT_URL}」"""
 
-        # メッセージリストの構築（よりシンプルに）
-        messages = [
-            {"role": "system", "content": system_prompt}
-        ]
-        
-        # 会話履歴を追加（最大16件 = 8往復分）
-        if len(chat_history) > 0:
-            messages.extend(chat_history[-16:])
-        
-        # 現在のユーザーメッセージを追加
+    return base
+
+
+def _call_openai(messages: list[dict], max_tokens: int) -> str:
+    response = client.chat.completions.create(
+        model=MODEL_NAME,
+        messages=messages,
+        max_tokens=max_tokens,
+        temperature=TEMPERATURE,
+        presence_penalty=PRESENCE_PENALTY,
+        frequency_penalty=FREQUENCY_PENALTY,
+    )
+    content = response.choices[0].message.content or ""
+    cleaned = remove_markdown(content.strip())
+    return normalize_numbered_list(cleaned)
+
+
+def generate_initial_message(form_data: dict) -> str:
+    prompt = _build_initial_prompt(form_data)
+    return _call_openai(
+        messages=[
+            {"role": "system", "content": prompt},
+            {"role": "user", "content": "お客様への初回メッセージをお願いします。"},
+        ],
+        max_tokens=INITIAL_MAX_TOKENS,
+    )
+
+
+def _rate_limit_response() -> tuple:
+    msg = (
+        "申し訳ございません、現在多くのお問い合わせをいただいております😅\n\n"
+        "少しお待ちいただくか、直接お問い合わせいただけますか？\n\n"
+        f"お急ぎの場合はこちらから:\n{CONTACT_URL}"
+    )
+    return jsonify({"response": msg, "status": "rate_limit"}), 429
+
+
+def _server_error_response() -> tuple:
+    msg = (
+        "申し訳ございません、一時的にエラーが発生しました😣\n\n"
+        "お手数ですが、以下からお問い合わせいただけますか？\n\n"
+        f"{CONTACT_URL}"
+    )
+    return jsonify({"response": msg, "status": "error"}), 500
+
+
+# --- ルート ---
+@app.route("/chat", methods=["POST"])
+def chat() -> Any:
+    try:
+        data = request.get_json(silent=True) or {}
+        user_message = (data.get("message") or "").strip()
+        form_data = data.get("formData") or {}
+        chat_history = data.get("chatHistory") or []
+        chat_count = int(data.get("chatCount") or 0)
+
+        # --- 初回メッセージ ---
+        if chat_count == 0:
+            assistant_response = generate_initial_message(form_data)
+            return jsonify({"response": assistant_response})
+
+        # --- 2 回目以降 ---
+        if not user_message:
+            return jsonify({"response": "メッセージが空でした。もう一度入力してください😊"}), 400
+
+        customer_context = format_customer_info(form_data)
+        system_prompt = _build_chat_prompt(customer_context, chat_count)
+
+        # 履歴は直近 N 往復のみ送信
+        recent_history = chat_history[-(HISTORY_TURNS * 2):]
+        messages = [{"role": "system", "content": system_prompt}]
+        messages.extend(recent_history)
         messages.append({"role": "user", "content": user_message})
 
-        # OpenAI API呼び出し
-        response = openai.ChatCompletion.create(
-            model="gpt-4o",
-            messages=messages,
-            max_tokens=500,
-            temperature=0.8,  # より自然な会話のため少し上げる
-            presence_penalty=0.3,  # 繰り返しを避ける
-            frequency_penalty=0.3  # 同じフレーズの使用を抑制
-        )
-        
-        # レスポンスからマークダウンを除去
-        assistant_response = remove_markdown(response.choices[0].message.content.strip())
-        
-        # 番号付きリストの形式を統一（念のため）
-        assistant_response = re.sub(r'(\d+)\s*[.．。]\s*', r'\1. ', assistant_response)
-        
-        return jsonify({'response': assistant_response})
+        assistant_response = _call_openai(messages, max_tokens=CHAT_MAX_TOKENS)
+        return jsonify({"response": assistant_response})
 
-    except openai.error.RateLimitError:
-        error_message = (
-            "申し訳ございません、現在多くのお問い合わせをいただいております😅\n\n"
-            "少しお待ちいただくか、直接お問い合わせいただけますか？\n\n"
-            "お急ぎの場合はこちらから:\n"
-            "https://re-homekumamoto.com/contact/"
-        )
-        return jsonify({'response': error_message, 'status': 'rate_limit'}), 429
-        
-    except Exception as e:
-        print(f"Error in chat endpoint: {str(e)}")
-        error_message = (
-            "申し訳ございません、一時的にエラーが発生しました😣\n\n"
-            "お手数ですが、以下からお問い合わせいただけますか？\n\n"
-            "https://re-homekumamoto.com/contact/"
-        )
-        return jsonify({'response': error_message, 'status': 'error'}), 500
+    except RateLimitError:
+        logger.warning("OpenAI rate limit hit")
+        return _rate_limit_response()
+    except APIError as exc:
+        logger.exception("OpenAI APIError: %s", exc)
+        return _server_error_response()
+    except Exception as exc:  # noqa: BLE001
+        logger.exception("Unexpected error in /chat: %s", exc)
+        return _server_error_response()
 
-@app.route('/health')
-def health():
-    return jsonify({'status': 'healthy'})
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+@app.route("/health")
+def health() -> Any:
+    return jsonify({"status": "healthy", "model": MODEL_NAME})
+
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("FLASK_DEBUG") == "1"
+    logger.info("Starting on port %d (model=%s, debug=%s)", port, MODEL_NAME, debug)
+    app.run(host="0.0.0.0", port=port, debug=debug)
