@@ -44,10 +44,9 @@ python main.py
 ## デプロイ(Railway)
 
 1. GitHub リポジトリを Railway に接続
-2. ルートディレクトリに `reform-assistant-gpt5` を指定(または該当フォルダで再構成)
+2. ルートディレクトリに `reform-assistant-gpt5` を指定
 3. 環境変数 `OPENAI_API_KEY` を設定
-4. ビルド: `pip install -r requirements.txt`
-5. 起動: `Procfile` の `web: gunicorn -b 0.0.0.0:$PORT main:app` が使われます
+4. Nixpacks が自動検出して `gunicorn main:app` で起動します
 
 ## モデル料金(2026-05 時点)
 
@@ -61,8 +60,6 @@ GPT-5.4 mini:
 reform-assistant-gpt5/
 ├── main.py            Flask アプリ本体
 ├── requirements.txt   依存パッケージ
-├── Procfile           Railway/Heroku 起動コマンド
-├── runtime.txt        Python バージョン指定
 ├── README.md          このファイル
 └── static/
     ├── index.html     SPA(ヒアリング + チャット)
