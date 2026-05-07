@@ -680,26 +680,6 @@
             30% { transform: translateY(-5px); opacity: 1; }
         }
 
-        /* contact-button の閉じるボタン */
-        .contact-close {
-            background: transparent;
-            border: none;
-            color: inherit;
-            cursor: pointer;
-            padding: 0.25rem;
-            margin-left: 0.4rem;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.7;
-            transition: opacity 0.2s ease, background 0.2s ease;
-        }
-
-        .contact-close:hover {
-            opacity: 1;
-            background: rgba(0,0,0,0.08);
-        }
 
         .send-btn {
             padding: 1rem 1.5rem;
@@ -1143,19 +1123,12 @@
                 </div>
 
                 <!-- ホバー問い合わせボタン -->
-                <div class="contact-button" id="contact-button" role="group">
-                    <a href="https://re-homekumamoto.com/contact/" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:0.5rem; color:inherit; text-decoration:none;">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/>
-                        </svg>
-                        詳しくはこちら
-                    </a>
-                    <button type="button" class="contact-close" onclick="dismissContactButton()" aria-label="閉じる">
-                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="width:18px; height:18px;">
-                            <path d="M18 6L6 18M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
+                <a href="https://re-homekumamoto.com/contact/" target="_blank" rel="noopener" class="contact-button" id="contact-button">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/>
+                    </svg>
+                    詳しくはこちら
+                </a>
             </div>
         </div>
     </div>
@@ -1634,10 +1607,10 @@
                 focusChatInput();
             }
 
-            // ホバーボタンを表示（ユーザーが閉じていない場合のみ）
+            // ホバー問い合わせボタンを表示
             setTimeout(() => {
                 const contactButton = document.getElementById('contact-button');
-                if (contactButton && !contactButton.dataset.dismissed) {
+                if (contactButton) {
                     contactButton.classList.add('show');
                 }
             }, 1000);
@@ -1818,13 +1791,6 @@
         function backToHearing() {
             document.getElementById('chat-screen').classList.add('hidden');
             document.getElementById('hearing-screen').classList.remove('hidden');
-        }
-
-        function dismissContactButton() {
-            const btn = document.getElementById('contact-button');
-            if (!btn) return;
-            btn.classList.remove('show');
-            btn.dataset.dismissed = '1';
         }
 
         // 初期化
