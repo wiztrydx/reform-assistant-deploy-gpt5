@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>リフォーム提案アシスタント - リフォーム熊本</title>
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <style>
@@ -602,18 +602,103 @@
 
         .chat-input {
             flex: 1;
-            padding: 1rem 1.5rem;
+            padding: 0.85rem 1.25rem;
             border: 2px solid #e2e8f0;
-            border-radius: 25px;
+            border-radius: 22px;
             font-size: 1rem;
+            line-height: 1.5;
             outline: none;
-            transition: all 0.2s ease;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
             min-height: 50px;
+            max-height: 160px;
+            resize: none;
+            font-family: inherit;
+            overflow-y: auto;
         }
 
         .chat-input:focus {
             border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+        }
+
+        /* クイックリプライ・チップ */
+        .quick-replies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0.5rem 0 1.25rem 52px; /* avatar 36px + gap 16px */
+        }
+
+        .quick-reply-chip {
+            background: white;
+            border: 1.5px solid #3b82f6;
+            color: #3b82f6;
+            padding: 0.55rem 1rem;
+            border-radius: 999px;
+            font-size: 0.92rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: transform 0.15s ease, background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+            line-height: 1.3;
+            text-align: left;
+            max-width: 100%;
+        }
+
+        .quick-reply-chip:hover,
+        .quick-reply-chip:focus-visible {
+            background: linear-gradient(135deg, #3b82f6 0%, #ef4444 100%);
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+            outline: none;
+        }
+
+        .quick-reply-chip:active {
+            transform: translateY(0);
+        }
+
+        /* 3ドット タイピングインジケーター */
+        .typing-indicator {
+            display: inline-flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .typing-indicator span {
+            width: 7px;
+            height: 7px;
+            background: #94a3b8;
+            border-radius: 50%;
+            animation: typing-bounce 1.2s infinite ease-in-out;
+        }
+
+        .typing-indicator span:nth-child(2) { animation-delay: 0.15s; }
+        .typing-indicator span:nth-child(3) { animation-delay: 0.3s; }
+
+        @keyframes typing-bounce {
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+            30% { transform: translateY(-5px); opacity: 1; }
+        }
+
+        /* contact-button の閉じるボタン */
+        .contact-close {
+            background: transparent;
+            border: none;
+            color: inherit;
+            cursor: pointer;
+            padding: 0.25rem;
+            margin-left: 0.4rem;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+            transition: opacity 0.2s ease, background 0.2s ease;
+        }
+
+        .contact-close:hover {
+            opacity: 1;
+            background: rgba(0,0,0,0.08);
         }
 
         .send-btn {
@@ -1036,44 +1121,59 @@
                             <div class="chat-title-sub">あなたの理想の住まいを一緒に考えます</div>
                         </div>
                     </div>
-                    <button class="btn btn-secondary" onclick="backToHearing()" style="padding: 0.5rem; min-height: auto;">
-                        <svg class="icon" viewBox="0 0 24 24">
+                    <button class="btn btn-secondary" onclick="backToHearing()" style="padding: 0.5rem; min-height: auto;" aria-label="ヒアリング画面に戻る">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M19 12H5m7-7l-7 7 7 7"/>
                         </svg>
                     </button>
                 </div>
 
-                <div class="chat-messages" id="chat-messages">
+                <div class="chat-messages" id="chat-messages" role="log" aria-live="polite" aria-label="チャット履歴">
                     <!-- チャットメッセージがここに表示されます -->
                 </div>
 
                 <div class="chat-input-container">
-                    <input type="text" class="chat-input" id="chat-input" placeholder="メッセージを入力してください..." onkeypress="handleChatKeyPress(event)">
-                    <button class="send-btn" id="send-btn" onclick="sendMessage()">
-                        <!-- 新しいセンスの良い送信アイコン -->
-                        <svg class="icon" viewBox="0 0 24 24">
+                    <textarea class="chat-input" id="chat-input" placeholder="メッセージを入力してください... (Enterで送信 / Shift+Enterで改行)" rows="1" aria-label="メッセージを入力"></textarea>
+                    <button class="send-btn" id="send-btn" onclick="sendMessage()" aria-label="送信">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                             <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                         </svg>
                         送信
                     </button>
                 </div>
 
-                <!-- ホバー問い合わせボタン - 送信ボタンの少し上に配置 -->
-                <a href="https://re-homekumamoto.com/contact/" target="_blank" class="contact-button" id="contact-button">
-                    <svg class="icon" viewBox="0 0 24 24">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/>
-                    </svg>
-                    詳しくはこちら
-                </a>
+                <!-- ホバー問い合わせボタン -->
+                <div class="contact-button" id="contact-button" role="group">
+                    <a href="https://re-homekumamoto.com/contact/" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:0.5rem; color:inherit; text-decoration:none;">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6m4-3h6v6m-11 5L21 3"/>
+                        </svg>
+                        詳しくはこちら
+                    </a>
+                    <button type="button" class="contact-close" onclick="dismissContactButton()" aria-label="閉じる">
+                        <svg class="icon" viewBox="0 0 24 24" aria-hidden="true" style="width:18px; height:18px;">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // グローバル変数
+        'use strict';
+
+        // --- 定数 ---
+        const STORAGE_KEY = 'reformAssistantHearingV1';
+        const CONTACT_URL = 'https://re-homekumamoto.com/contact/';
+
+        // --- 状態 ---
         let currentStep = 0;
-        let chatCount = 0; // チャット往復回数をカウント
-        let formData = {
+        let chatCount = 0;            // チャット往復回数
+        let chatHistory = [];          // [{role:'user'|'assistant', content:string}]
+        let isComposing = false;       // IME 変換中フラグ
+        let isSending = false;         // 多重送信防止
+        const defaultFormData = () => ({
             familyMembers: [],
             familyAges: {},
             pets: {},
@@ -1086,7 +1186,32 @@
             budget: '',
             timeline: '',
             otherRequests: ''
-        };
+        });
+        let formData = loadFormData() || defaultFormData();
+
+        // --- localStorage 永続化 ---
+        function saveFormData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+            } catch (e) { /* QuotaExceeded などは無視 */ }
+        }
+
+        function loadFormData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return null;
+                const parsed = JSON.parse(raw);
+                // 既定キーをマージしてスキーマ差分を吸収
+                return Object.assign(defaultFormData(), parsed);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function clearFormData() {
+            formData = defaultFormData();
+            try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* noop */ }
+        }
 
         const steps = [
             {
@@ -1369,27 +1494,23 @@
                     checkbox.checked = !checkbox.checked;
                     
                     if (field === 'pets') {
-                        // ペットの場合
                         formData.pets[value] = checkbox.checked;
                     } else {
-                        // その他の配列フィールドの場合
                         if (checkbox.checked) {
                             if (!formData[field].includes(value)) {
                                 formData[field].push(value);
                             }
-                            this.classList.add('checked');
                         } else {
                             formData[field] = formData[field].filter(item => item !== value);
-                            this.classList.remove('checked');
                         }
                     }
-                    
-                    // 見た目を更新
+
                     if (checkbox.checked) {
                         this.classList.add('checked');
                     } else {
                         this.classList.remove('checked');
                     }
+                    saveFormData();
                 });
             });
         }
@@ -1400,6 +1521,7 @@
             } else {
                 formData[field] = value;
             }
+            saveFormData();
         }
 
         // ナビゲーション関数
@@ -1471,132 +1593,181 @@
             }
         }
 
-        // チャット機能 - 初回メッセージもサーバーから取得するように修正
+        // --- チャット機能 ---
         async function startChat() {
             document.getElementById('hearing-screen').classList.add('hidden');
             document.getElementById('chat-screen').classList.remove('hidden');
-            
-            // ローディング表示
+
+            // 状態リセット
+            chatCount = 0;
+            chatHistory = [];
+            document.getElementById('chat-messages').innerHTML = '';
+
             showLoadingMessage();
-            
+
             try {
-                // 初回メッセージをサーバーから取得（chatCount=0として送信）
                 const response = await fetch('/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: '',  // 初回は空メッセージ
+                        message: '',
                         formData: formData,
                         chatHistory: [],
-                        chatCount: 0  // 初回メッセージであることを示す
+                        chatCount: 0
                     })
                 });
-                
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                
-                const data = await response.json();
-                
-                // ローディングを削除
+
+                const data = await response.json().catch(() => ({}));
                 removeLoadingMessage();
-                
-                // AIからの初回メッセージを追加
+
+                if (!response.ok) {
+                    addMessage('assistant', data.response || 'エラーが発生しました。お手数ですが、お問い合わせフォームよりご連絡ください。\n' + CONTACT_URL);
+                    return;
+                }
+
                 addMessage('assistant', data.response);
-                
             } catch (error) {
                 console.error('Error:', error);
                 removeLoadingMessage();
-                // エラー時のフォールバック
-                addMessage('assistant', 'お客様の情報を確認させていただきました。どのようなリフォームをお考えでしょうか？');
+                addMessage('assistant', 'ネットワークに接続できませんでした😣 通信状況をご確認の上、もう一度お試しください。');
+            } finally {
+                focusChatInput();
             }
-            
-            // ホバーボタンを表示
+
+            // ホバーボタンを表示（ユーザーが閉じていない場合のみ）
             setTimeout(() => {
                 const contactButton = document.getElementById('contact-button');
-                contactButton.classList.add('show');
+                if (contactButton && !contactButton.dataset.dismissed) {
+                    contactButton.classList.add('show');
+                }
             }, 1000);
         }
 
         async function sendMessage() {
+            if (isSending) return;
+
             const chatInput = document.getElementById('chat-input');
             const sendBtn = document.getElementById('send-btn');
             const message = chatInput.value.trim();
-            
             if (!message) return;
-            
-            // ユーザーメッセージを追加
+
+            isSending = true;
+            sendBtn.disabled = true;
+            chatCount++;
+
             addMessage('user', message);
             chatInput.value = '';
-            
-            // 送信ボタンを無効化
-            sendBtn.disabled = true;
-            
-            // ローディング表示
+            autoResizeChatInput();
+
             showLoadingMessage();
-            
-            // チャット回数をカウント
-            chatCount++;
-            
+
             try {
                 const response = await fetch('/chat', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         message: message,
                         formData: formData,
-                        chatHistory: getChatHistory(),
+                        chatHistory: chatHistory.slice(-16), // 直近 8 往復
                         chatCount: chatCount
                     })
                 });
-                
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                
-                const data = await response.json();
-                
-                // ローディングを削除
+
+                const data = await response.json().catch(() => ({}));
                 removeLoadingMessage();
-                
-                // アシスタントの返答を追加
-                addMessage('assistant', data.response);
-                
+
+                if (response.status === 429) {
+                    addMessage('assistant', data.response || '少し時間を空けてからもう一度お試しください😅');
+                } else if (!response.ok) {
+                    addMessage('assistant', data.response || 'エラーが発生しました。再度お試しください。');
+                } else {
+                    addMessage('assistant', data.response);
+                }
             } catch (error) {
                 console.error('Error:', error);
                 removeLoadingMessage();
-                addMessage('assistant', 'エラーが発生しました。再度お試しください。');
+                addMessage('assistant', 'ネットワークに接続できませんでした😣 通信状況をご確認ください。');
             } finally {
-                // 送信ボタンを有効化
+                isSending = false;
                 sendBtn.disabled = false;
+                focusChatInput();
             }
+        }
+
+        // HTMLエスケープ
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // URL をリンク化（先にエスケープしてから処理）
+        function linkifyEscaped(escapedText) {
+            const urlRegex = /(https?:\/\/[^\s<]+)/g;
+            return escapedText.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+        }
+
+        // 「1. 〇〇」「2. △△」… を抽出してチップ用に返す
+        function extractQuickReplies(text) {
+            const replies = [];
+            const lines = text.split(/\r?\n/);
+            const re = /^\s*(\d+)\.\s+(.+?)\s*$/;
+            for (const line of lines) {
+                const m = line.match(re);
+                if (m) replies.push(m[2]);
+            }
+            // 1〜5件くらいに収める
+            return replies.length >= 2 && replies.length <= 6 ? replies : [];
         }
 
         function addMessage(role, content) {
             const chatMessages = document.getElementById('chat-messages');
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${role}`;
-            
-            const avatarSvg = role === 'assistant' ? 
-                '<svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>' :
-                '<svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>';
-            
-            // URLをリンクに変換する関数
-            const linkifyContent = (text) => {
-                const urlRegex = /(https?:\/\/[^\s]+)/g;
-                return text.replace(urlRegex, '<a href="$1" target="_blank">$1</a>');
-            };
-            
+
+            const avatarSvg = role === 'assistant'
+                ? '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
+                : '<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2M12 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>';
+
+            const safe = linkifyEscaped(escapeHtml(content));
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatarSvg}</div>
-                <div class="message-content">${linkifyContent(content)}</div>
+                <div class="message-content">${safe}</div>
             `;
-            
             chatMessages.appendChild(messageDiv);
+
+            // 状態にも追加
+            chatHistory.push({ role, content });
+
+            // アシスタントの「1. 2. 3.」をクイックリプライ・チップとして表示
+            if (role === 'assistant') {
+                const replies = extractQuickReplies(content);
+                if (replies.length > 0) {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'quick-replies';
+                    wrap.setAttribute('role', 'group');
+                    wrap.setAttribute('aria-label', '選択肢');
+                    replies.forEach(reply => {
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.className = 'quick-reply-chip';
+                        btn.textContent = reply;
+                        btn.addEventListener('click', () => {
+                            // チップを使い切ったら全部消す
+                            wrap.remove();
+                            const input = document.getElementById('chat-input');
+                            input.value = reply;
+                            sendMessage();
+                        });
+                        wrap.appendChild(btn);
+                    });
+                    chatMessages.appendChild(wrap);
+                }
+            }
+
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
@@ -1605,43 +1776,41 @@
             const loadingDiv = document.createElement('div');
             loadingDiv.className = 'message assistant';
             loadingDiv.id = 'loading-message';
-            
+
             loadingDiv.innerHTML = `
                 <div class="message-avatar">
-                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 </div>
-                <div class="loading-message">
-                    <div class="loading-spinner"></div>
-                    <span>回答を生成中...</span>
+                <div class="loading-message" aria-label="入力中">
+                    <span class="typing-indicator" aria-hidden="true"><span></span><span></span><span></span></span>
                 </div>
             `;
-            
             chatMessages.appendChild(loadingDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
         function removeLoadingMessage() {
             const loadingMessage = document.getElementById('loading-message');
-            if (loadingMessage) {
-                loadingMessage.remove();
-            }
+            if (loadingMessage) loadingMessage.remove();
         }
 
-        function getChatHistory() {
-            const messages = [];
-            const messageElements = document.querySelectorAll('.message:not(#loading-message)');
-            
-            messageElements.forEach(element => {
-                const role = element.classList.contains('user') ? 'user' : 'assistant';
-                const content = element.querySelector('.message-content').textContent;
-                messages.push({ role, content });
-            });
-            
-            return messages;
+        // --- 入力欄の動作 ---
+        function autoResizeChatInput() {
+            const el = document.getElementById('chat-input');
+            if (!el) return;
+            el.style.height = 'auto';
+            el.style.height = Math.min(el.scrollHeight, 160) + 'px';
         }
 
-        function handleChatKeyPress(event) {
-            if (event.key === 'Enter') {
+        function focusChatInput() {
+            const el = document.getElementById('chat-input');
+            if (el && !('ontouchstart' in window)) el.focus();
+        }
+
+        function handleChatKeyDown(event) {
+            // IME 変換中の Enter は確定なので無視
+            if (event.key === 'Enter' && !event.shiftKey && !isComposing) {
+                event.preventDefault();
                 sendMessage();
             }
         }
@@ -1651,11 +1820,26 @@
             document.getElementById('hearing-screen').classList.remove('hidden');
         }
 
+        function dismissContactButton() {
+            const btn = document.getElementById('contact-button');
+            if (!btn) return;
+            btn.classList.remove('show');
+            btn.dataset.dismissed = '1';
+        }
+
         // 初期化
         document.addEventListener('DOMContentLoaded', function() {
             renderCurrentStep();
             updateProgress();
             updateNavigation();
+
+            const chatInput = document.getElementById('chat-input');
+            if (chatInput) {
+                chatInput.addEventListener('keydown', handleChatKeyDown);
+                chatInput.addEventListener('input', autoResizeChatInput);
+                chatInput.addEventListener('compositionstart', () => { isComposing = true; });
+                chatInput.addEventListener('compositionend', () => { isComposing = false; });
+            }
         });
     </script>
 </body>
