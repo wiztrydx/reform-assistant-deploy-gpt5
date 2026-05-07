@@ -5,7 +5,6 @@ from __future__ import annotations
 import logging
 import os
 import re
-import sys
 from typing import Any
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -30,13 +29,14 @@ logging.basicConfig(
 logger = logging.getLogger("reform-assistant")
 
 # --- OpenAI クライアント ---
+# 起動時に APIキー が無くてもプロセスは落とさず、/chat 呼び出し時にエラー応答する。
+# (Railway 等のデプロイで env 未注入時にワーカーが即死しないように)
 api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
-    logger.error("OPENAI_API_KEY が設定されていません。起動を中止します。")
-    sys.exit(1)
+    logger.warning("OPENAI_API_KEY が未設定です。/chat はエラー応答を返します。")
 
 client = OpenAI(
-    api_key=api_key,
+    api_key=api_key or "missing",
     base_url=os.getenv("OPENAI_API_BASE"),  # None なら公式エンドポイント
 )
 
